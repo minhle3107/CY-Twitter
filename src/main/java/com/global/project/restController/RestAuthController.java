@@ -41,8 +41,9 @@ public class RestAuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         AccountDetailsImpl accountDetails = (AccountDetailsImpl) authentication.getPrincipal();
 
-        String jwt = jwtUtils.generateTokenByUsername(accountDetails.getUsername());
-        return ResponseEntity.ok(new SigninResponse(accountDetails.getAccount().getId(), "Bearer", jwt, accountDetails.getUsername(), accountDetails.getAccount().getEmail(),
+        String accountToken = jwtUtils.generateTokenByUsername(accountDetails.getUsername());
+        String refreshToken = jwtUtils.generateRefreshTokenByUsername(accountDetails.getUsername());
+        return ResponseEntity.ok(new SigninResponse(accountDetails.getAccount().getId(), "Bearer", accountToken, refreshToken, accountDetails.getUsername(), accountDetails.getAccount().getEmail(),
                 accountDetails.getAccount().getIsActive(), accountDetails.getRoleName()));
     }
 
