@@ -1,7 +1,6 @@
 package com.global.project.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -9,10 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "refresh_tokens", indexes = {
-        @Index(name = "idx_device_info", columnList = "device_info"),
-        @Index(name = "idx_token", columnList = "token")
-})
+@Table(name = "refresh_tokens")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,20 +21,18 @@ public class RefreshToken {
     @Column(name = "account_id")
     private Long accountId;
 
-    @Size(max = 255)
-    @Column(name = "token")
+    @Column(name = "token", columnDefinition = "TEXT")
     private String token;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "iat")
+    @Column(name = "iat") // ngày tạo
     private LocalDateTime iat;
 
-    @Column(name = "exp")
+    @Column(name = "exp") // ngày hết hạn
     private LocalDateTime exp;
 
-    @Size(max = 255)
-    @Column(name = "device_info")
+    @Column(name = "device_info", columnDefinition = "TEXT")
     private String deviceInfo;
 }
