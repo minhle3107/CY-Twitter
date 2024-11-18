@@ -56,7 +56,7 @@ public class AuthService implements IAuthService {
 
             String accountToken = jwtUtils.generateTokenByUsername(accountDetails.getUsername());
 
-            String refreshToken = jwtUtils.generateRefreshTokenByUsername(now.plus(Duration.ofMillis(jwtExpirationRefreshToken)), accountDetails.getUsername());
+            String refreshToken = jwtUtils.generateRefreshTokenByUsername(now, accountDetails.getUsername());
 
             saveOrUpdateRefreshToken(accountId, refreshToken, now, deviceInfo);
 

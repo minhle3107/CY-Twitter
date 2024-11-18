@@ -69,20 +69,20 @@ public class JwtProvider {
         }
     }
 
-    public String generateRefreshTokenByUsername(LocalDateTime iat, String Username) {
+    public String generateRefreshTokenByUsername(LocalDateTime exp, String Username) {
 
-        Date iatDate = DateConversion.convertToDate(iat);
+        Date expDate = DateConversion.convertToDate(exp);
 
-//        Date now = new Date();
-//        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION_REFRESH_TOKEN);
+        Date expiryDate = new Date(expDate.getTime() + JWT_EXPIRATION_REFRESH_TOKEN);
+
         Account account = accountRepository.findByUsername(Username).get();
         return Jwts.builder()
                 .setSubject(Long.toString(account.getId()))
                 .claim("username", account.getUsername())
                 .claim("token_type", EnumTokenType.RefreshToken.getValue())
                 .claim("account_status", EnumAccountVerifyStatus.Verified.getValue())
-                .setExpiration(iatDate)
-                .setIssuedAt(new Date())
+                .setExpiration(expiryDate)
+                .setIssuedAt(expDate)
                 .signWith(SignatureAlgorithm.HS512, JWT_SECRET_REFRESH_TOKEN)
                 .compact();
     }
