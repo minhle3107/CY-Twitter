@@ -14,9 +14,9 @@ import java.util.Date;
 
 @Component
 public class JwtProvider {
-    @Value("${jwt.SECRET_KEY}")
+    @Value("${jwt.SECRET_ACCESS_TOKEN_KEY}")
     private String JWT_SECRET;
-    @Value("${jwt.JWT_EXPIRATION}")
+    @Value("${jwt.JWT_EXPIRATION_ACCESS_TOKEN}")
     private int JWT_EXPIRATION;
     @Autowired
     UserRepository userRepository;

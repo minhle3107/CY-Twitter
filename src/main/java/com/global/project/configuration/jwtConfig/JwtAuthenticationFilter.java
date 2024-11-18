@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     UserServiceImpl userService;
     @Autowired
     UserRepository userRepository;
-    @Value("${jwt.SECRET_KEY}")
+    @Value("${jwt.SECRET_ACCESS_TOKEN_KEY}")
     private String JWT_SECRET;
 
     @Override

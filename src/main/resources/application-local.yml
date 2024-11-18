@@ -55,8 +55,8 @@ server:
 
 #Secret Key HS512
 jwt:
-  SECRET_KEY: askhdqiwu48123y123cxv2134123/123u1t238gqhjwdnjaqwhuie412/312i3o1y28712iekjasbdiuqw9e812739jasldk/zxkcbaskanskdlasda/scaksjcoiasjdoi12312o123/qwkjehqwuiehjiqwueiqwuejkqwndoqwd/129831yu293h12ui3qhwiuehqwuieiwheiqwe
-  JWT_EXPIRATION: 28800000
+  SECRET_ACCESS_TOKEN_KEY: askhdqiwu48123y123cxv2134123/123u1t238gqhjwdnjaqwhuie412/312i3o1y28712iekjasbdiuqw9e812739jasldk/zxkcbaskanskdlasda/scaksjcoiasjdoi12312o123/qwkjehqwuiehjiqwueiqwuejkqwndoqwd/129831yu293h12ui3qhwiuehqwuieiwheiqwe
+  JWT_EXPIRATION_ACCESS_TOKEN: 28800000
 config:
   path: C:\\Users\\PCM\\Desktop\\
 
