@@ -63,3 +63,4 @@ jwt:
   JWT_EXPIRATION_FOGOT_PASSWORD_TOKEN: 86400000 # 1day
 config:
   path: C:\\Users\\PCM\\Desktop\\
+  
