@@ -1,12 +1,13 @@
 package com.global.project.modal;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Getter
+@Setter
+@Builder
 public class SigninResponse {
     private Long id;
     private String type = "Bearer";

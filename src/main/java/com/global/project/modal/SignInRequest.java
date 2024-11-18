@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class SigninRequest {
+public class SignInRequest {
     @Schema(title = "username", example = "admin")
     @NotBlank
     private String username;
