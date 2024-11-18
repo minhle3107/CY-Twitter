@@ -5,6 +5,7 @@ import com.global.project.entity.Account;
 import com.global.project.enums.EnumAccountVerifyStatus;
 import com.global.project.enums.EnumTokenType;
 import com.global.project.repository.AccountRepository;
+import com.global.project.utils.DateConversion;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 
 @Component
@@ -63,17 +63,12 @@ public class JwtProvider {
                 .compact();
     }
 
-    private class DateConversion {
-        public static Date convertToDate(LocalDateTime localDateTime) {
-            return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-        }
-    }
 
-    public String generateRefreshTokenByUsername(LocalDateTime exp, String Username) {
+    public String generateRefreshTokenByUsername(LocalDateTime iat, String Username) {
 
-        Date expDate = DateConversion.convertToDate(exp);
+        Date iatDate = DateConversion.convertLocalDateTimeToDate(iat);
 
-        Date expiryDate = new Date(expDate.getTime() + JWT_EXPIRATION_REFRESH_TOKEN);
+        Date expiryDate = new Date(iatDate.getTime() + JWT_EXPIRATION_REFRESH_TOKEN);
 
         Account account = accountRepository.findByUsername(Username).get();
         return Jwts.builder()
@@ -82,7 +77,7 @@ public class JwtProvider {
                 .claim("token_type", EnumTokenType.RefreshToken.getValue())
                 .claim("account_status", EnumAccountVerifyStatus.Verified.getValue())
                 .setExpiration(expiryDate)
-                .setIssuedAt(expDate)
+                .setIssuedAt(iatDate)
                 .signWith(SignatureAlgorithm.HS512, JWT_SECRET_REFRESH_TOKEN)
                 .compact();
     }

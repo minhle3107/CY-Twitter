@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "UNCATEGORIZED ERROR"),
     INVALID_KEY(1001, "INVALID MESSAGE KEY"),
-    INVALID_CREDENTIAL(1002, "INVALID CREDENTIAL");
-
+    INVALID_CREDENTIAL(1002, "INVALID CREDENTIAL"),
+    TOKEN_EXPIRED(1003, "TOKEN EXPIRED");
 
     private int code;
     private String message;

@@ -91,16 +91,16 @@ public class AuthService implements IAuthService {
         if (existingToken != null) {
             existingToken.setToken(refreshToken);
             existingToken.setCreatedAt(now);
-            existingToken.setIat(now.plus(Duration.ofMillis(jwtExpirationRefreshToken)));
-            existingToken.setExp(now);
+            existingToken.setExp(now.plus(Duration.ofMillis(jwtExpirationRefreshToken)));
+            existingToken.setIat(now);
             iRefreshTokenRepository.save(existingToken);
         } else {
             RefreshToken refreshTokenModel = RefreshToken.builder()
                     .accountId(accountId)
                     .token(refreshToken)
                     .createdAt(now)
-                    .iat(now.plus(Duration.ofMillis(jwtExpirationRefreshToken)))
-                    .exp(now)
+                    .exp(now.plus(Duration.ofMillis(jwtExpirationRefreshToken)))
+                    .iat(now)
                     .deviceInfo(deviceInfo)
                     .build();
             iRefreshTokenRepository.save(refreshTokenModel);
