@@ -1,8 +1,8 @@
 package com.global.project.configuration.jwtConfig;
 
-import com.global.project.entity.User;
-import com.global.project.repository.UserRepository;
-import com.global.project.configuration.UserDetailsImpl;
+import com.global.project.configuration.AccountDetailsImpl;
+import com.global.project.entity.Account;
+import com.global.project.repository.AccountRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,31 +14,36 @@ import java.util.Date;
 
 @Component
 public class JwtProvider {
+    @Autowired
+    private AccountRepository accountRepository;
     @Value("${jwt.SECRET_ACCESS_TOKEN_KEY}")
     private String JWT_SECRET;
     @Value("${jwt.JWT_EXPIRATION_ACCESS_TOKEN}")
     private int JWT_EXPIRATION;
-    @Autowired
-    UserRepository userRepository;
 
-    public String generateToken(UserDetailsImpl customDetailService){
+    public JwtProvider(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
+
+    public String generateToken(AccountDetailsImpl customDetailService) {
         return this.generateTokenByUsername(customDetailService.getUsername());
     }
-    public String generateTokenByUsername(String Username){
+
+    public String generateTokenByUsername(String Username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
-        User userEntity = userRepository.findByUsername(Username).get();
+        Account account = accountRepository.findByUsername(Username).get();
         return Jwts.builder()
-                .setSubject(Long.toString(userEntity.getId()))
-                .claim("username", userEntity.getUsername())
-                .claim("role", userEntity.getRole().getName())
+                .setSubject(Long.toString(account.getId()))
+                .claim("username", account.getUsername())
+                .claim("role", account.getRole().getName())
                 .setExpiration(expiryDate)
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
                 .compact();
     }
 
-    public Long getUserIdFromJWT(String token){
+    public Long getUserIdFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(JWT_SECRET)
                 .parseClaimsJws(token)
@@ -46,11 +51,11 @@ public class JwtProvider {
         return Long.parseLong(claims.getSubject());
     }
 
-    public String getKeyByValueFromJWT(String key, String token){
+    public String getKeyByValueFromJWT(String key, String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(JWT_SECRET)
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.get(key,String.class);
+        return claims.get(key, String.class);
     }
 }

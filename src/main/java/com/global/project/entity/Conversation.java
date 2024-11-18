@@ -11,23 +11,24 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "conversations")
+public class Conversation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     @Size(max = 255)
-    @Column(name = "name")
-    private String name;
+    @Column(name = "sender_username")
+    private String senderUsername;
 
-    @Column(name = "description")
-    private Integer description;
+    @Size(max = 255)
+    @Column(name = "receive_username")
+    private String receiveUsername;
 
-    @ColumnDefault("1")
-    @Column(name = "status")
-    private Boolean status;
+    @Lob
+    @Column(name = "content")
+    private String content;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")

@@ -1,6 +1,5 @@
 package com.global.project.utils;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,9 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 
 @Component
 public class FileUtils {
@@ -29,13 +25,14 @@ public class FileUtils {
 
                 Files.write(uploadPath, file.getBytes());
 
-                return DOMAIN_NAME + Instant.now().getEpochSecond()+ file.getOriginalFilename() + "?sg=" + file.getOriginalFilename();
+                return DOMAIN_NAME + Instant.now().getEpochSecond() + file.getOriginalFilename() + "?sg=" + file.getOriginalFilename();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         return null;
     }
+
     public boolean deleteFile(String filename) {
         String[] fileSplit = filename.split("/");
         String fullFilePath = UPLOAD_FOLDER + File.separator + fileSplit[fileSplit.length - 1];
@@ -55,7 +52,8 @@ public class FileUtils {
             return false;
         }
     }
-    public String getPathFile(){
+
+    public String getPathFile() {
         return UPLOAD_FOLDER;
     }
 }

@@ -26,15 +26,14 @@ public class Unauthorized implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         final Map<String, Object> body = new HashMap<>();
-        body.put("timestamp",new Date());
+        body.put("timestamp", new Date());
         body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        if(authException.getMessage().equals("Bad credentials")){
-            body.put("error","Bad credentials");
-            body.put("message","Invalid username or password");
-        }
-        else{
-            body.put("error","Unauthorized");
-            body.put("message","Token invalid");
+        if (authException.getMessage().equals("Bad credentials")) {
+            body.put("error", "Bad credentials");
+            body.put("message", "Invalid username or password");
+        } else {
+            body.put("error", "Unauthorized");
+            body.put("message", "Token invalid");
         }
         body.put("path", request.getRequestURI());
         final ObjectMapper mapper = new ObjectMapper();

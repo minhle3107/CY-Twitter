@@ -9,7 +9,6 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -26,7 +25,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
-public class Security{
+public class Security {
     @Autowired
     JwtAuthenticationFilter jwtAuthenticationFilter;
     @Autowired
@@ -53,7 +52,7 @@ public class Security{
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -71,9 +70,9 @@ public class Security{
                             try {
                                 requests
                                         .requestMatchers(new AntPathRequestMatcher("/public/**"),
-                                                        new AntPathRequestMatcher("/error"),
-                                                        new AntPathRequestMatcher("/auth/**"),
-                                                        new AntPathRequestMatcher("/**")
+                                                new AntPathRequestMatcher("/error"),
+                                                new AntPathRequestMatcher("/auth/**"),
+                                                new AntPathRequestMatcher("/**")
                                         )
                                         .permitAll()
                                         .anyRequest()
@@ -92,6 +91,7 @@ public class Security{
                 .httpBasic();
         return http.build();
     }
+
     @Bean
     public JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(entityManager);

@@ -11,30 +11,22 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "tweet_images")
+public class TweetImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "tweet_id")
+    private Long tweetId;
+
     @Size(max = 255)
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "description")
-    private Integer description;
-
-    @ColumnDefault("1")
-    @Column(name = "status")
-    private Boolean status;
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
     private Instant createdAt;
-
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "updated_at")
-    private Instant updatedAt;
 
 }

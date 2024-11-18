@@ -11,30 +11,29 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "refresh_tokens")
+public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account accountId;
+
     @Size(max = 255)
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "description")
-    private Integer description;
-
-    @ColumnDefault("1")
-    @Column(name = "status")
-    private Boolean status;
+    @Column(name = "token")
+    private String token;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "updated_at")
-    private Instant updatedAt;
+    @Column(name = "iat")
+    private Instant iat;
+
+    @Column(name = "exp")
+    private Instant exp;
 
 }

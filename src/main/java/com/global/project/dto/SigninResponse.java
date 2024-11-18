@@ -1,4 +1,4 @@
-package com.global.project.modal;
+package com.global.project.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,5 +14,6 @@ public class SigninResponse {
     private String username;
     private String email;
     private Boolean isActive;
+    private String avatar;
     private String roleName;
 }

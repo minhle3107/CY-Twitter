@@ -9,12 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "UNCATEGORIZED ERROR"),
-    INVALID_KEY(1001, "INVALID MESSAGE KEY")
-
-
-    ;
-
-
+    INVALID_KEY(1001, "INVALID MESSAGE KEY");
 
 
     private int code;

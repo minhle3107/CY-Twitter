@@ -11,8 +11,8 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "permissions")
+public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -22,12 +22,9 @@ public class Role {
     @Column(name = "name")
     private String name;
 
+    @Lob
     @Column(name = "description")
-    private Integer description;
-
-    @ColumnDefault("1")
-    @Column(name = "status")
-    private Boolean status;
+    private String description;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")

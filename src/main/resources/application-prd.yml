@@ -4,14 +4,14 @@ spring:
     url: jdbc:mysql://{endpoint}:{port}/{nameSchema}?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf-8
     username:
     password:
-#  thymeleaf:
-#    cache: false
-#    prefix: classpath:/templates/
-#    check-template-location: true
-#    check-template: true
-#    suffix: .html
-#    encoding: UTF-8
-#    content-type: text/html
+  #  thymeleaf:
+  #    cache: false
+  #    prefix: classpath:/templates/
+  #    check-template-location: true
+  #    check-template: true
+  #    suffix: .html
+  #    encoding: UTF-8
+  #    content-type: text/html
   jpa:
     show-sql: false
     hibernate:
