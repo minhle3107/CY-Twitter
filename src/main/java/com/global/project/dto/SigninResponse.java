@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 public class SigninResponse {
     private Long id;
     private String type = "Bearer";
-    private String token;
+    private String accountToken;
+    private String refreshToken;
     private String username;
     private String email;
     private Boolean isActive;
