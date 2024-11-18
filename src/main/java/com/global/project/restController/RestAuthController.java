@@ -1,13 +1,13 @@
 package com.global.project.restController;
 
+import com.global.project.configuration.AccountDetailsImpl;
+import com.global.project.configuration.jwtConfig.JwtProvider;
+import com.global.project.entity.Account;
 import com.global.project.modal.SigninRequest;
 import com.global.project.modal.SigninResponse;
-import com.global.project.entity.User;
+import com.global.project.repository.AccountRepository;
 import com.global.project.repository.RoleRepository;
-import com.global.project.repository.UserRepository;
-import com.global.project.service.IUserService;
-import com.global.project.configuration.jwtConfig.JwtProvider;
-import com.global.project.configuration.UserDetailsImpl;
+import com.global.project.services.IAccountService;
 import com.global.project.utils.Const;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,11 +29,7 @@ public class RestAuthController {
     @Autowired
     JwtProvider jwtUtils;
     @Autowired
-    IUserService iUserService;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    RoleRepository roleRepository;
+    AccountRepository accountRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -43,18 +39,19 @@ public class RestAuthController {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        AccountDetailsImpl accountDetails = (AccountDetailsImpl) authentication.getPrincipal();
 
-        String jwt = jwtUtils.generateTokenByUsername(userDetails.getUsername());
-            return ResponseEntity.ok(new SigninResponse(userDetails.getUser().getId(), "Bearer", jwt, userDetails.getUsername(), userDetails.getUser().getEmail(),
-                    userDetails.getUser().getActive(), userDetails.getUser().getAvatar(), userDetails.getRoleName()));
+        String jwt = jwtUtils.generateTokenByUsername(accountDetails.getUsername());
+        return ResponseEntity.ok(new SigninResponse(accountDetails.getAccount().getId(), "Bearer", jwt, accountDetails.getUsername(), accountDetails.getAccount().getEmail(),
+                accountDetails.getAccount().getIsActive(), accountDetails.getRoleName()));
     }
+
     @Operation(summary = "reset pass admin", description = "reset pass admin to admin", tags = {"01. AUTH"})
     @GetMapping("/resetPassAdmin")
-    public String resetPassAdmin(){
-        User user = userRepository.findByUsername("admin").orElse(null);
-        user.setPassword(passwordEncoder.encode("admin"));
-        userRepository.save(user);
+    public String resetPassAdmin() {
+        Account account = accountRepository.findByUsername("admin").orElse(null);
+        account.setPassword(passwordEncoder.encode("admin"));
+        accountRepository.save(account);
         return "";
     }
 }

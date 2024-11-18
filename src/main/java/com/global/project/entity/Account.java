@@ -12,23 +12,28 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "accounts")
+public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     @Size(max = 255)
-    @Column(name = "name")
-    private String name;
+    @Column(name = "username")
+    private String username;
 
-    @Column(name = "description")
-    private Integer description;
+    @Size(max = 255)
+    @Column(name = "password")
+    private String password;
 
-    @ColumnDefault("1")
-    @Column(name = "status")
-    private Boolean status;
+    @Size(max = 255)
+    @Column(name = "forgot_password_token")
+    private String forgotPasswordToken;
+
+    @Size(max = 255)
+    @Column(name = "email")
+    private String email;
 
 
     @Column(name = "created_at")
@@ -37,5 +42,13 @@ public class Role {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+
+    @Column(name = "is_active")
+    private Boolean isActive;
+
+    @OneToOne
+    @JoinColumn(name = "id_role")
+    Role role;
 
 }

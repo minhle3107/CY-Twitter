@@ -1,8 +1,10 @@
 package com.global.project.configuration.jwtConfig;
 
-import com.global.project.repository.UserRepository;
-import com.global.project.service.serviceImpl.UserServiceImpl;
-import com.global.project.configuration.UserDetailsImpl;
+//import com.global.project.configuration.AccountDetailsImpl;
+
+import com.global.project.configuration.AccountDetailsImpl;
+import com.global.project.repository.AccountRepository;
+import com.global.project.services.impl.AccountService;
 import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,22 +26,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     JwtProvider jwtProvider;
     @Autowired
-    UserServiceImpl userService;
+    AccountService accountService;
     @Autowired
-    UserRepository userRepository;
+    AccountRepository accountRepository;
     @Value("${jwt.SECRET_ACCESS_TOKEN_KEY}")
     private String JWT_SECRET;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try{
+        try {
             String jwtToken = getJwtFromRequest(request);
-            if(jwtToken != null && this.validateToken(jwtToken)){
+            if (jwtToken != null && this.validateToken(jwtToken)) {
                 String username = jwtProvider.getKeyByValueFromJWT("username", jwtToken);
-                UserDetailsImpl userDetails = (UserDetailsImpl) userService.loadUserByUsername(username);
-                if(userDetails != null) {
+                AccountDetailsImpl accountDetails = (AccountDetailsImpl) accountService.loadUserByUsername(username);
+                if (accountDetails != null) {
                     UsernamePasswordAuthenticationToken
-                            authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                            authentication = new UsernamePasswordAuthenticationToken(accountDetails, null, accountDetails.getAuthorities());
 
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
@@ -47,40 +49,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 }
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
         filterChain.doFilter(request, response);
     }
 
-    private String getJwtFromRequest(HttpServletRequest request){
+    private String getJwtFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-        if(StringUtils.hasText(token) && token.startsWith("Bearer ")){
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
             return token.substring(7);
         }
         return null;
     }
 
-    public boolean validateToken(String authToken){
-        try{
+    public boolean validateToken(String authToken) {
+        try {
             Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(authToken);
             return true;
-        }
-        catch (SignatureException e){
-            logger.error("Invalid JWT signature: "+ e.getMessage());
-        }
-        catch (MalformedJwtException e){
-            logger.error("Invalid JWT token: "+ e.getMessage());
-        }
-        catch (ExpiredJwtException e){
-            logger.error("JWT token is expired: "+ e.getMessage());
-        }
-        catch (UnsupportedJwtException e){
-            logger.error("JWT token unsupported: "+ e.getMessage());
-        }
-        catch (IllegalArgumentException e){
-            logger.error("JWT claims string is empty: "+ e.getMessage());
+        } catch (SignatureException e) {
+            logger.error("Invalid JWT signature: " + e.getMessage());
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid JWT token: " + e.getMessage());
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT token is expired: " + e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            logger.error("JWT token unsupported: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("JWT claims string is empty: " + e.getMessage());
         }
         return false;
     }

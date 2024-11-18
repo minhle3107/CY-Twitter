@@ -12,30 +12,21 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "via_codes")
+public class ViaCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Size(max = 255)
-    @Column(name = "name")
-    private String name;
+    @Column(name = "via_code")
+    private Integer viaCode;
 
-    @Column(name = "description")
-    private Integer description;
-
-    @ColumnDefault("1")
-    @Column(name = "status")
-    private Boolean status;
-
+    @Size(max = 200)
+    @Column(name = "email", length = 200)
+    private String email;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
 }

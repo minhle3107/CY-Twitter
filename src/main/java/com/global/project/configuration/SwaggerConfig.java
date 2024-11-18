@@ -15,6 +15,7 @@ import java.util.List;
 public class SwaggerConfig {
     private static final String SCHEME_NAME = "Token";
     private static final String SCHEME = "Bearer";
+
     @Bean
     public OpenAPI OpenAPI() {
         Server devServer = new Server();

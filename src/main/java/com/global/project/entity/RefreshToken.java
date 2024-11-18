@@ -12,30 +12,28 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "refresh_tokens")
+public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column (name = "account_id")
+    private Long accountId;
+
     @Size(max = 255)
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "description")
-    private Integer description;
-
-    @ColumnDefault("1")
-    @Column(name = "status")
-    private Boolean status;
+    @Column(name = "token")
+    private String token;
 
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "iat")
+    private LocalDateTime iat;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "exp")
+    private LocalDateTime exp;
 
 }

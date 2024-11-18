@@ -26,10 +26,10 @@ public class Forbidden implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         final Map<String, Object> body = new HashMap<>();
-        body.put("timestamp",new Date());
+        body.put("timestamp", new Date());
         body.put("status", HttpServletResponse.SC_FORBIDDEN);
-        body.put("error","Forbidden");
-        body.put("message","You not permission");
+        body.put("error", "Forbidden");
+        body.put("message", "You not permission");
         body.put("path", request.getRequestURI());
         final ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);
