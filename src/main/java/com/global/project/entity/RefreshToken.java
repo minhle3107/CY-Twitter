@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,22 +19,21 @@ public class RefreshToken {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account accountId;
+    @Column (name = "account_id")
+    private Long accountId;
 
     @Size(max = 255)
     @Column(name = "token")
     private String token;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
+
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "iat")
-    private Instant iat;
+    private LocalDateTime iat;
 
     @Column(name = "exp")
-    private Instant exp;
+    private LocalDateTime exp;
 
 }

@@ -99,6 +99,11 @@
             <version>${querydsl.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.6.2</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -29,12 +30,12 @@ public class Notification {
     @Column(name = "content")
     private String content;
 
-    @ColumnDefault("1")
+
     @Column(name = "status")
     private Boolean status;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
+
     @Column(name = "created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
 }
