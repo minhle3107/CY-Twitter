@@ -11,4 +11,7 @@ public interface IRefreshTokenRepository extends JpaRepository<RefreshToken, Lon
     RefreshToken findByAccountIdAndDeviceInfo(Long accountId, String deviceInfo);
 
     Optional<RefreshToken> findByToken(String token);
+
+    RefreshToken getByToken(String token);
+    //String deleteRefreshToken(Optional<RefreshToken> token);
 }
