@@ -1,16 +1,18 @@
 package com.global.project.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class SigninResponse {
+@Getter
+@Setter
+@Builder
+public class SignInResponse {
     private Long id;
     private String type = "Bearer";
-    private String token;
+    private String accountToken;
+    private String refreshToken;
     private String username;
     private String email;
     private Boolean isActive;

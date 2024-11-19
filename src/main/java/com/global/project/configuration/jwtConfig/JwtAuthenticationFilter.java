@@ -3,6 +3,8 @@ package com.global.project.configuration.jwtConfig;
 //import com.global.project.configuration.AccountDetailsImpl;
 
 import com.global.project.configuration.AccountDetailsImpl;
+import com.global.project.enums.EnumAccountVerifyStatus;
+import com.global.project.enums.EnumTokenType;
 import com.global.project.repository.AccountRepository;
 import com.global.project.services.impl.AccountService;
 import io.jsonwebtoken.*;
@@ -29,17 +31,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     AccountService accountService;
     @Autowired
     AccountRepository accountRepository;
+
+
     @Value("${jwt.SECRET_ACCESS_TOKEN_KEY}")
-    private String JWT_SECRET;
+    private String JWT_SECRET_ACCESS_TOKEN;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwtToken = getJwtFromRequest(request);
-            if (jwtToken != null && this.validateToken(jwtToken)) {
-                String username = jwtProvider.getKeyByValueFromJWT("username", jwtToken);
+            if (jwtToken != null && this.validateToken(JWT_SECRET_ACCESS_TOKEN, jwtToken)) {
+                String username = jwtProvider.getKeyByValueFromJWT(JWT_SECRET_ACCESS_TOKEN, "username", jwtToken, String.class);
+                int tokenType = jwtProvider.getKeyByValueFromJWT(JWT_SECRET_ACCESS_TOKEN, "token_type", jwtToken, Integer.class);
+                int accountStatus = jwtProvider.getKeyByValueFromJWT(JWT_SECRET_ACCESS_TOKEN, "account_status", jwtToken, Integer.class);
                 AccountDetailsImpl accountDetails = (AccountDetailsImpl) accountService.loadUserByUsername(username);
-                if (accountDetails != null) {
+                if (tokenType == EnumTokenType.AccessToken.getValue() && accountStatus == EnumAccountVerifyStatus.Verified.getValue() &&
+                        accountDetails != null) {
                     UsernamePasswordAuthenticationToken
                             authentication = new UsernamePasswordAuthenticationToken(accountDetails, null, accountDetails.getAuthorities());
 
@@ -63,9 +70,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    public boolean validateToken(String authToken) {
+    public boolean validateToken(String jwtTokenSecret, String token) {
         try {
-            Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey(jwtTokenSecret).parseClaimsJws(token);
             return true;
         } catch (SignatureException e) {
             logger.error("Invalid JWT signature: " + e.getMessage());
