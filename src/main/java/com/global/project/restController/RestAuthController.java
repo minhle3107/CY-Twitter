@@ -1,9 +1,13 @@
 package com.global.project.restController;
 
+import com.global.project.dto.ApiResponse;
 import com.global.project.entity.Account;
 import com.global.project.modal.SignInRequest;
+import com.global.project.modal.SignupRequest;
 import com.global.project.repository.AccountRepository;
+import com.global.project.services.IAccountService;
 import com.global.project.services.IAuthService;
+import com.global.project.services.IAuthenticationService;
 import com.global.project.utils.Const;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +27,10 @@ public class RestAuthController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    IAuthenticationService authenticationService;
+    @Autowired
+    IAccountService accountService;
 
     @Autowired
     IAuthService iAuthService;
@@ -37,9 +45,26 @@ public class RestAuthController {
     @Operation(summary = "reset pass admin", description = "reset pass admin to admin", tags = {"01. AUTH"})
     @GetMapping("/resetPassAdmin")
     public String resetPassAdmin() {
-        Account account = accountRepository.findByUsername("admin").orElse(null);
+        Account account = accountRepository.findByUser_Username("admin").orElse(null);
         account.setPassword(passwordEncoder.encode("admin"));
         accountRepository.save(account);
         return "";
     }
+
+    @GetMapping("/via-email")
+    public ApiResponse<?> viaEmailToResgister(@RequestParam String email) {
+        return ApiResponse.builder()
+                .data(authenticationService.handleSendCodeToMail(email))
+                .message("Send code to maill successfulll")
+                .build();
+    }
+
+    @PostMapping("/sign-up")
+    public ApiResponse<?> signUp(@RequestBody SignupRequest signupRequest) {
+        return ApiResponse.builder()
+                .data(accountService.registerAccount(signupRequest))
+                .message("Successfully registered")
+                .build();
+    }
+
 }

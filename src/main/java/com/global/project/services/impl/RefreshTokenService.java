@@ -67,7 +67,7 @@ public class RefreshTokenService implements IRefreshTokenService {
 
 
         String username = jwtProvider.getKeyByValueFromJWT(jwtSecretRefreshToken, "username", request.getRefreshToken(), String.class);
-        Account account = accountRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIAL));
+        Account account = accountRepository.findByUser_Username(username).orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIAL));
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -83,9 +83,9 @@ public class RefreshTokenService implements IRefreshTokenService {
         SignInResponse response = SignInResponse.builder()
                 .id(account.getId())
                 .type("Bearer")
-                .accountToken(jwtProvider.generateTokenByUsername(account.getUsername()))
+                .accountToken(jwtProvider.generateTokenByUsername(account.getUser().getUsername()))
                 .refreshToken(newRefreshTokenStr)
-                .username(account.getUsername())
+                .username(account.getUser().getUsername())
                 .email(account.getEmail())
                 .isActive(account.getIsActive())
                 .roleName(account.getRole().getName())
@@ -103,11 +103,11 @@ public class RefreshTokenService implements IRefreshTokenService {
     private String generateNewRefreshToken(LocalDateTime exp, LocalDateTime iat, String username) {
         Date expDate = DateConversion.convertLocalDateTimeToDate(exp);
         Date iatDate = DateConversion.convertLocalDateTimeToDate(iat);
-        Account account = accountRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIAL));
+        Account account = accountRepository.findByUser_Username(username).orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIAL));
 
         return Jwts.builder()
                 .setSubject(Long.toString(account.getId()))
-                .claim("username", account.getUsername())
+                .claim("username", account.getUser().getUsername())
                 .claim("token_type", EnumTokenType.RefreshToken.getValue())
                 .claim("account_status", EnumAccountVerifyStatus.Verified.getValue())
                 .setExpiration(expDate)

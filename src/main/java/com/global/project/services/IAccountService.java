@@ -1,5 +1,8 @@
 package com.global.project.services;
 
-public interface IAccountService {
+import com.global.project.dto.AccountResponse;
+import com.global.project.modal.SignupRequest;
 
+public interface IAccountService {
+    AccountResponse registerAccount(SignupRequest signupRequest);
 }

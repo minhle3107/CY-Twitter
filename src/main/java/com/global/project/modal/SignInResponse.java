@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class SigninResponse {
+public class SignInResponse {
     private Long id;
     private String type = "Bearer";
     private String accountToken;

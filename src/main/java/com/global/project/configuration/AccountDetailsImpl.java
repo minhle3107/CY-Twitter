@@ -42,9 +42,9 @@ public class AccountDetailsImpl implements UserDetails {
     public String getUsername() {
         if (account == null)
             return null;
-        if (account.getUsername() == null)
+        if (account.getUser() == null)
             return null;
-        return account.getUsername();
+        return account.getUser().getUsername();
     }
 
     public String getRoleName() {

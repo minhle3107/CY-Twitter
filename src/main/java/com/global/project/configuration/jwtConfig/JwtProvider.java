@@ -50,10 +50,10 @@ public class JwtProvider {
     public String generateTokenByUsername(String Username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION_ACCESS_TOKEN);
-        Account account = accountRepository.findByUsername(Username).get();
+        Account account = accountRepository.findByUser_Username(Username).get();
         return Jwts.builder()
                 .setSubject(Long.toString(account.getId()))
-                .claim("username", account.getUsername())
+                .claim("username", account.getUser().getUsername())
                 .claim("role", account.getRole().getName())
                 .claim("token_type", EnumTokenType.AccessToken.getValue())
                 .claim("account_status", EnumAccountVerifyStatus.Verified.getValue())
@@ -70,10 +70,10 @@ public class JwtProvider {
 
         Date expiryDate = new Date(iatDate.getTime() + JWT_EXPIRATION_REFRESH_TOKEN);
 
-        Account account = accountRepository.findByUsername(Username).get();
+        Account account = accountRepository.findByUser_Username(Username).get();
         return Jwts.builder()
                 .setSubject(Long.toString(account.getId()))
-                .claim("username", account.getUsername())
+                .claim("username", account.getUser().getUsername())
                 .claim("token_type", EnumTokenType.RefreshToken.getValue())
                 .claim("account_status", EnumAccountVerifyStatus.Verified.getValue())
                 .setExpiration(expiryDate)
@@ -85,10 +85,10 @@ public class JwtProvider {
     public String generateForgotPasswordTokenByUsername(String Username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION_FORGOT_PASSWORD_TOKEN);
-        Account account = accountRepository.findByUsername(Username).get();
+        Account account = accountRepository.findByUser_Username(Username).get();
         return Jwts.builder()
                 .setSubject(Long.toString(account.getId()))
-                .claim("username", account.getUsername())
+                .claim("username", account.getUser().getUsername())
                 .claim("token_type", EnumTokenType.ForgotPasswordToken.getValue())
                 .claim("account_status", EnumAccountVerifyStatus.Verified.getValue())
                 .setExpiration(expiryDate)
