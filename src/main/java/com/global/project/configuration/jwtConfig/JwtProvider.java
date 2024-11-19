@@ -105,11 +105,11 @@ public class JwtProvider {
         return Long.parseLong(claims.getSubject());
     }
 
-    public String getKeyByValueFromJWT(String jwtSecretKey, String key, String token) {
+    public <T> T getKeyByValueFromJWT(String jwtSecretKey, String key, String token, Class<T> clazz) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecretKey)
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.get(key, String.class);
+        return claims.get(key, clazz);
     }
 }

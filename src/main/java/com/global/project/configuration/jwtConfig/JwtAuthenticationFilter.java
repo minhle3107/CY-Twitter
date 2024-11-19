@@ -41,9 +41,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwtToken = getJwtFromRequest(request);
             if (jwtToken != null && this.validateToken(JWT_SECRET_ACCESS_TOKEN, jwtToken)) {
-                String username = jwtProvider.getKeyByValueFromJWT(JWT_SECRET_ACCESS_TOKEN, "username", jwtToken);
-                int tokenType = Integer.parseInt(jwtProvider.getKeyByValueFromJWT(JWT_SECRET_ACCESS_TOKEN, "token_type", jwtToken));
-                int accountStatus = Integer.parseInt(jwtProvider.getKeyByValueFromJWT(JWT_SECRET_ACCESS_TOKEN, "account_status", jwtToken));
+                String username = jwtProvider.getKeyByValueFromJWT(JWT_SECRET_ACCESS_TOKEN, "username", jwtToken, String.class);
+                int tokenType = jwtProvider.getKeyByValueFromJWT(JWT_SECRET_ACCESS_TOKEN, "token_type", jwtToken, Integer.class);
+                int accountStatus = jwtProvider.getKeyByValueFromJWT(JWT_SECRET_ACCESS_TOKEN, "account_status", jwtToken, Integer.class);
                 AccountDetailsImpl accountDetails = (AccountDetailsImpl) accountService.loadUserByUsername(username);
                 if (tokenType == EnumTokenType.AccessToken.getValue() && accountStatus == EnumAccountVerifyStatus.Verified.getValue() &&
                         accountDetails != null) {
