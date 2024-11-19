@@ -33,10 +33,10 @@ public class JwtProvider {
     @Value("${jwt.JWT_EXPIRATION_REFRESH_TOKEN}")
     private int JWT_EXPIRATION_REFRESH_TOKEN;
 
-    @Value("${jwt.SECRET_FOGOT_PASSWORD_TOKEN_KEY}")
+    @Value("${jwt.SECRET_FORGOT_PASSWORD_TOKEN_KEY}")
     private String JWT_SECRET_FORGOT_PASSWORD_TOKEN;
 
-    @Value("${jwt.JWT_EXPIRATION_FOGOT_PASSWORD_TOKEN}")
+    @Value("${jwt.JWT_EXPIRATION_FORGOT_PASSWORD_TOKEN}")
     private int JWT_EXPIRATION_FORGOT_PASSWORD_TOKEN;
 
     public JwtProvider(AccountRepository accountRepository) {
