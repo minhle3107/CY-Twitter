@@ -5,6 +5,8 @@ import com.global.project.configuration.jwtConfig.JwtProvider;
 import com.global.project.dto.ApiResponse;
 import com.global.project.dto.SignInResponse;
 import com.global.project.entity.RefreshToken;
+import com.global.project.exception.AppException;
+import com.global.project.exception.ErrorCode;
 import com.global.project.modal.SignInRequest;
 import com.global.project.repository.AccountRepository;
 import com.global.project.repository.IRefreshTokenRepository;
@@ -78,11 +80,7 @@ public class AuthService implements IAuthService {
 
             return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
         } catch (Exception e) {
-            ApiResponse<SignInResponse> apiResponse = ApiResponse.<SignInResponse>builder()
-                    .code(1002)
-                    .message("Login failed!")
-                    .build();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiResponse);
+            throw new AppException(ErrorCode.LOGIN_FAILED);
         }
     }
 
