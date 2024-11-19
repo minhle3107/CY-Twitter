@@ -42,7 +42,10 @@ public class RefreshTokenService implements IRefreshTokenService {
 
     @Override
     public ResponseEntity<ApiResponse<SignInResponse>> refreshToken(RefreshAccessTokenRequest request) {
-        RefreshToken oldToken = refreshTokenRepository.findByToken(request.getRefreshToken())
+
+        String refreshToken = request.getRefreshToken();
+
+        RefreshToken oldToken = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIAL));
 
         // ngày hết hạn token nhỏ hơn ngày hiện tại
@@ -50,7 +53,20 @@ public class RefreshTokenService implements IRefreshTokenService {
             throw new AppException(ErrorCode.TOKEN_EXPIRED);
         }
 
-        String username = jwtProvider.getKeyByValueFromJWT(jwtSecretRefreshToken, "username", request.getRefreshToken());
+        int tokenType = jwtProvider.getKeyByValueFromJWT(jwtSecretRefreshToken, "token_type", refreshToken, Integer.class);
+
+        if (tokenType != EnumTokenType.RefreshToken.getValue()) {
+            throw new AppException(ErrorCode.TOKEN_EXPIRED);
+        }
+
+        int accountStatus = jwtProvider.getKeyByValueFromJWT(jwtSecretRefreshToken, "account_status", refreshToken, Integer.class);
+
+        if (accountStatus != EnumAccountVerifyStatus.Verified.getValue()) {
+            throw new AppException(ErrorCode.ACCOUNT_INVALID);
+        }
+
+
+        String username = jwtProvider.getKeyByValueFromJWT(jwtSecretRefreshToken, "username", request.getRefreshToken(), String.class);
         Account account = accountRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.INVALID_CREDENTIAL));
 
         LocalDateTime now = LocalDateTime.now();
