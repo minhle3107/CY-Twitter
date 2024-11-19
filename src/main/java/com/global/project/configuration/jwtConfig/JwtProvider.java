@@ -32,10 +32,10 @@ public class JwtProvider {
     public String generateTokenByUsername(String Username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
-        Account account = accountRepository.findByUsername(Username).get();
+        Account account = accountRepository.findByUser_Username(Username).get();
         return Jwts.builder()
                 .setSubject(Long.toString(account.getId()))
-                .claim("username", account.getUsername())
+                .claim("username", account.getUser().getUsername())
                 .claim("role", account.getRole().getName())
                 .setExpiration(expiryDate)
                 .setIssuedAt(new Date())

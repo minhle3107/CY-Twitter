@@ -10,7 +10,7 @@ public class SecurityUtils {
     }
 
     public static String getCurrentUsername() {
-        return getCurrentUser().getAccount().getUsername();
+        return getCurrentUser().getAccount().getUser().getUsername();
     }
 
     public static AccountDetailsImpl getCurrentUser() {
