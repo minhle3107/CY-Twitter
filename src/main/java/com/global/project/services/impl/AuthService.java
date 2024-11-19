@@ -7,6 +7,7 @@ import com.global.project.dto.SignInResponse;
 import com.global.project.entity.RefreshToken;
 import com.global.project.exception.AppException;
 import com.global.project.exception.ErrorCode;
+import com.global.project.modal.LogoutRequest;
 import com.global.project.modal.SignInRequest;
 import com.global.project.repository.AccountRepository;
 import com.global.project.repository.IRefreshTokenRepository;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class AuthService implements IAuthService {
@@ -83,6 +85,26 @@ public class AuthService implements IAuthService {
             throw new AppException(ErrorCode.LOGIN_FAILED);
         }
     }
+
+    @Override
+    public ResponseEntity<ApiResponse<?>> logout(LogoutRequest logoutRequest) {
+        try {
+            String refreshToken = logoutRequest.getRequestToken();
+            RefreshToken existingToken = iRefreshTokenRepository.getByToken(refreshToken);
+            if (existingToken !=null) {
+                iRefreshTokenRepository.delete(existingToken);
+            } else {
+                throw new AppException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+            }
+            ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+                    .message("Logout successful")
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.LOGOUT_FAILED);
+        }
+    }
+
 
     private void saveOrUpdateRefreshToken(Long accountId, String refreshToken, LocalDateTime now, String deviceInfo) {
         RefreshToken existingToken = iRefreshTokenRepository.findByAccountIdAndDeviceInfo(accountId, deviceInfo);

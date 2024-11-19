@@ -2,6 +2,7 @@ package com.global.project.restController;
 
 import com.global.project.dto.ApiResponse;
 import com.global.project.entity.Account;
+import com.global.project.modal.LogoutRequest;
 import com.global.project.modal.SignInRequest;
 import com.global.project.modal.SignupRequest;
 import com.global.project.repository.AccountRepository;
@@ -40,6 +41,12 @@ public class RestAuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody SignInRequest signInRequest, HttpServletRequest request) {
         return iAuthService.login(signInRequest, request);
+    }
+
+    @Operation(summary = "logout", description = "logout to system", tags = {"01. AUTH"})
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest signInRequest) {
+        return iAuthService.logout(signInRequest);
     }
 
     @Operation(summary = "reset pass admin", description = "reset pass admin to admin", tags = {"01. AUTH"})
