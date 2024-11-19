@@ -1,6 +1,9 @@
 package com.global.project.services;
 
+import com.global.project.dto.AccountResponse;
 import com.global.project.entity.ViaCode;
+import com.global.project.modal.ChangePasswrodRequest;
+import jakarta.mail.MessagingException;
 
 public interface IAuthenticationService {
     int generateCode();
@@ -10,4 +13,8 @@ public interface IAuthenticationService {
     ViaCode insertCode(int code, String email);
 
     String handleSendCodeToMail(String email);
+
+    String sendTokenForgotPassword(String email) throws MessagingException;
+
+    AccountResponse resetPassword(ChangePasswrodRequest changePasswrodRequest);
 }
