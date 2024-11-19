@@ -9,6 +9,7 @@ import com.global.project.utils.DateConversion;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -33,9 +34,11 @@ public class JwtProvider {
     @Value("${jwt.JWT_EXPIRATION_REFRESH_TOKEN}")
     private int JWT_EXPIRATION_REFRESH_TOKEN;
 
+    @Getter
     @Value("${jwt.SECRET_FORGOT_PASSWORD_TOKEN_KEY}")
     private String JWT_SECRET_FORGOT_PASSWORD_TOKEN;
 
+    @Getter
     @Value("${jwt.JWT_EXPIRATION_FORGOT_PASSWORD_TOKEN}")
     private int JWT_EXPIRATION_FORGOT_PASSWORD_TOKEN;
 
