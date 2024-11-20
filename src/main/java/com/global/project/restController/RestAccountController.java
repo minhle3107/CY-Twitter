@@ -3,6 +3,7 @@ package com.global.project.restController;
 import com.global.project.dto.AccountResponse;
 import com.global.project.dto.ApiResponse;
 import com.global.project.dto.SignInResponse;
+import com.global.project.dto.UserResponse;
 import com.global.project.modal.RefreshAccessTokenRequest;
 import com.global.project.services.IAccountService;
 import com.global.project.services.IRefreshTokenService;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,5 +38,9 @@ public class RestAccountController {
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<AccountResponse>> getMe() {
         return accountService.getMe();
+    }
+    @GetMapping("/getme")
+    public ResponseEntity<ApiResponse<UserResponse>> getMe1() {
+        return accountService.getMe1();
     }
 }

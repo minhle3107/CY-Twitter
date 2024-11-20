@@ -4,11 +4,13 @@ import com.global.project.configuration.AccountDetailsImpl;
 import com.global.project.configuration.jwtConfig.JwtProvider;
 import com.global.project.dto.AccountResponse;
 import com.global.project.dto.ApiResponse;
+import com.global.project.dto.UserResponse;
 import com.global.project.entity.Account;
 import com.global.project.entity.User;
 import com.global.project.exception.AppException;
 import com.global.project.exception.ErrorCode;
 import com.global.project.mapper.AccountMapper;
+import com.global.project.mapper.UserMapper;
 import com.global.project.modal.SignupRequest;
 import com.global.project.repository.AccountRepository;
 import com.global.project.repository.RoleRepository;
@@ -40,7 +42,7 @@ public class AccountService implements IAccountService, UserDetailsService {
     UserRepository userRepository;
     AccountMapper accountMapper;
     JwtProvider _jwtProvider;
-
+    UserMapper userMapper;
 //    public AccountService(RoleRepository roleRepository, PasswordEncoder passwordEncoder, AccountRepository accountRepository) {
 //        this.accountRepository = accountRepository;
 //        this.roleRepository = roleRepository;
@@ -150,5 +152,24 @@ public class AccountService implements IAccountService, UserDetailsService {
         }
     }
 
+    @Override
+    public ResponseEntity<ApiResponse<UserResponse>> getMe1() {
+        try {
+            String username = _jwtProvider.getUsernameContext();
+            Account account = accountRepository.findByUser_Username(username)
+                    .orElseThrow(() -> new RuntimeException("Account not found"));
+            UserResponse userResponse = userMapper.toResponse(account);
+            ApiResponse<UserResponse> apiResponse = ApiResponse.<UserResponse>builder()
+                    .message("User details successfully.")
+                    .data(userResponse)
+                    .build();
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<UserResponse>builder()
+                            .message("An error occurred while retrieving account details.")
+                            .build());
+        }
+    }
 
 }
