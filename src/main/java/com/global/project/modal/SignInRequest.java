@@ -10,10 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class SignInRequest {
-    @Schema(title = "username", example = "admin")
     @NotBlank
     private String username;
-    @Schema(title = "password", example = "admin")
     @NotBlank
     private String password;
 }
