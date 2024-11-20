@@ -8,7 +8,6 @@ import com.global.project.modal.FollowRequest;
 import com.global.project.repository.IFollowRepository;
 import com.global.project.repository.UserRepository;
 import com.global.project.services.IFollowService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -29,6 +28,7 @@ public class FollowServiceImpl implements IFollowService {
         this._jwtProvider = jwtProvider;
         _userRepository = userRepository;
     }
+
     @Override
     public ResponseEntity<ApiResponse<?>> follow(FollowRequest followRequest) {
 
@@ -54,19 +54,18 @@ public class FollowServiceImpl implements IFollowService {
                                     .message("Unfollowed successfully.")
                                     .build()
                     );
-                } else {
-                    Follower newFollower = Follower.builder()
-                            .username(username)
-                            .createdAt(LocalDateTime.now())
-                            .followedUsername(followRequest.getFollowed_userName())
-                            .build();
-                    _followRepository.save(newFollower);
-                    return ResponseEntity.ok(
-                            ApiResponse.builder()
-                                    .message("Followed successfully.")
-                                    .build()
-                    );
                 }
+                Follower newFollower = Follower.builder()
+                        .username(username)
+                        .createdAt(LocalDateTime.now())
+                        .followedUsername(followRequest.getFollowed_userName())
+                        .build();
+                _followRepository.save(newFollower);
+                return ResponseEntity.ok(
+                        ApiResponse.builder()
+                                .message("Followed successfully.")
+                                .build()
+                );
             } else {
                 return ResponseEntity.badRequest().body(
                         ApiResponse.builder()
@@ -85,7 +84,7 @@ public class FollowServiceImpl implements IFollowService {
 
     @Override
     public ResponseEntity<ApiResponse<?>> followFe1(FollowRequest followRequest) {
-        try{
+        try {
             String username = _jwtProvider.getUsernameContext();
             Optional<User> userToFollow = _userRepository.findByUsername(followRequest.getFollowed_userName());
             if (userToFollow.isEmpty()) {
@@ -103,20 +102,20 @@ public class FollowServiceImpl implements IFollowService {
                                 .message("Unfollowed successfully.")
                                 .build()
                 );
-            } else {
-                Follower newFollower = Follower.builder()
-                        .username(username)
-                        .createdAt(LocalDateTime.now())
-                        .followedUsername(followRequest.getFollowed_userName())
-                        .build();
-                _followRepository.save(newFollower);
-                return ResponseEntity.ok(
-                        ApiResponse.builder()
-                                .message("Followed successfully.")
-                                .build()
-                );
             }
-        }catch (Exception e) {
+            Follower newFollower = Follower.builder()
+                    .username(username)
+                    .createdAt(LocalDateTime.now())
+                    .followedUsername(followRequest.getFollowed_userName())
+                    .build();
+            _followRepository.save(newFollower);
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .message("Followed successfully.")
+                            .build()
+            );
+
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body(
                     ApiResponse.builder()
                             .message("Đã xảy ra lỗi khi theo dõi/bỏ theo dõi người dùng.")
