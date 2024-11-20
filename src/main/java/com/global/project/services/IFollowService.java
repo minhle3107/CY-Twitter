@@ -7,4 +7,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface IFollowService {
     ResponseEntity<ApiResponse<?>> follow(FollowRequest followRequest);
+    ResponseEntity<ApiResponse<?>> followFe1(FollowRequest followRequest);
 }
