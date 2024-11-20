@@ -3,7 +3,6 @@ package com.global.project.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class Tweet extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "username", referencedColumnName = "username")
     private User user;
 
     @Column(name = "type")
@@ -47,5 +46,4 @@ public class Tweet extends BaseEntity {
 
     @OneToMany(mappedBy = "tweet")
     List<TweetHastag> hastags = new ArrayList<>();
-
 }
