@@ -11,6 +11,8 @@ import com.global.project.modal.ChangePasswrodRequest;
 import com.global.project.repository.AccountRepository;
 import com.global.project.repository.VIaCodeRepository;
 import com.global.project.services.IAuthenticationService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
@@ -161,6 +163,10 @@ public class AuthenticationService implements IAuthenticationService {
             throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
         }
 
+        if (!validateToken(jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(), changePasswrodRequest.getToken())) {
+            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+        }
+
         Date expDate = jwtProvider.getKeyByValueFromJWT(
                 jwtProvider.getJWT_SECRET_FORGOT_PASSWORD_TOKEN(),
                 "exp",
@@ -183,5 +189,12 @@ public class AuthenticationService implements IAuthenticationService {
         return accountMapper.toResponse(accountRepository.save(account));
     }
 
-
+    public boolean validateToken(String jwtTokenSecret, String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtTokenSecret).parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            return false;
+        }
+    }
 }

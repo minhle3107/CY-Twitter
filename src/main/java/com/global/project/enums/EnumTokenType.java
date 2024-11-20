@@ -13,4 +13,5 @@ public enum EnumTokenType {
     EnumTokenType(int value) {
         this.value = value;
     }
+
 }
