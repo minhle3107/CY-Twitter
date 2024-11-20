@@ -27,7 +27,7 @@ public class HastagService implements IHastagService {
                             .createdAt(LocalDateTime.now())
                             .build())
                     .toList();
-            
+
             hastagRepository.saveAll(newHasTags);
             return 1;
         } catch (Exception e) {

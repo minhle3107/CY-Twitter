@@ -46,6 +46,11 @@ public class TweetService implements ITweetService {
         }
 
         int resultInsertHastag = hastagService.insertHasTags(tweetRequest.getHastags());
+        if (resultInsertHastag != 1) {
+            throw new AppException(ErrorCode.HASTAG_CREATE_LIST_FAILED);
+        }
+
+
 
         Tweet tweet = Tweet.builder()
                 .type(tweetRequest.getType())
