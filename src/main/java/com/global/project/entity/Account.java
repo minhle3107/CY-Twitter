@@ -41,7 +41,7 @@ public class Account extends BaseEntity {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_role")
     Role role;
 

@@ -6,6 +6,7 @@ import com.global.project.dto.AccountResponse;
 import com.global.project.dto.ApiResponse;
 import com.global.project.dto.UserResponse;
 import com.global.project.entity.Account;
+import com.global.project.entity.Role;
 import com.global.project.entity.User;
 import com.global.project.exception.AppException;
 import com.global.project.exception.ErrorCode;
@@ -43,46 +44,6 @@ public class AccountService implements IAccountService, UserDetailsService {
     AccountMapper accountMapper;
     JwtProvider _jwtProvider;
     UserMapper userMapper;
-//    public AccountService(RoleRepository roleRepository, PasswordEncoder passwordEncoder, AccountRepository accountRepository) {
-//        this.accountRepository = accountRepository;
-//        this.roleRepository = roleRepository;
-//        this.passwordEncoder = passwordEncoder;
-//        User user = User.builder()
-//                .username("admin")
-//                .build();
-//        userRepository.saveAndFlush(user);
-//
-//        Account checkExsit = accountRepository.findByUser_Username("admin").orElse(null);
-//        if (checkExsit == null) {
-//            Account account = new Account();
-//            account.setEmail("admin");
-//            account.setUser(user);
-//            account.setIsActive(true);
-//            account.setEmail("test@gmail.com");
-//
-//            Role role = roleRepository.findByName(Const.ROLE_ADMIN);
-//            if (role == null) {
-//                role = new Role();
-//                role.setName(Const.ROLE_ADMIN);
-//                roleRepository.saveAndFlush(role);
-//            }
-//            account.setRole(role);
-//            account.setPassword(passwordEncoder.encode("admin"));
-//            accountRepository.save(account);
-//        }
-//        Role roleAdmin = roleRepository.findByName(Const.ROLE_ADMIN);
-//        if (roleAdmin == null) {
-//            roleAdmin = new Role();
-//            roleAdmin.setName(Const.ROLE_ADMIN);
-//            roleRepository.saveAndFlush(roleAdmin);
-//        }
-//        Role roleUser = roleRepository.findByName(Const.ROLE_USER);
-//        if (roleUser == null) {
-//            roleUser = new Role();
-//            roleUser.setName(Const.ROLE_USER);
-//            roleRepository.saveAndFlush(roleUser);
-//        }
-//    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -111,15 +72,19 @@ public class AccountService implements IAccountService, UserDetailsService {
         if (insertUser == null) {
             throw new AppException(ErrorCode.USER_CANT_CREATE_USER);
         }
+        Role role = roleRepository.findByName(Const.ROLE_USER);
+        if (role == null) {
+            throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+        }
         Account account = Account.builder()
                 .user(insertUser)
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .email(signupRequest.getEmail())
-                .role(roleRepository.findByName(Const.ROLE_USER))
+                .role(role)
                 .isActive(true)
                 .build();
 
-        return accountMapper.toResponse(accountRepository.saveAndFlush(account));
+        return accountMapper.toResponse(accountRepository.save(account));
     }
 
     @Override
