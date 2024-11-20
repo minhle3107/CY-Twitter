@@ -1,9 +1,6 @@
 package com.global.project.dto;
 
-import jakarta.persistence.Column;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class HastagResponse {
+public class TweetHastagResponse {
+    Long tweetId;
     private String name;
-    private LocalDateTime createdAt;
 }

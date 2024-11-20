@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,41 +39,93 @@ public class TweetService implements ITweetService {
     TweetMapper tweetMapper;
     UserRepository userRepository;
     HastagService hastagService;
+    TweetMentionService mentionService;
+    TweetImageService tweetImageService;
+    private final TweetHastagService tweetHastagService;
 
     @Override
-    public TweetResponse createTweet(TweetRequest tweetRequest) {
+    public TweetResponse createTweet(TweetRequest tweetRequest) throws IOException {
         Optional<User> optional = userRepository.findByUsername(tweetRequest.getUsername());
         if (optional.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
 
-        int resultInsertHastag = hastagService.insertHasTags(tweetRequest.getHastags());
-        if (resultInsertHastag != 1) {
-            throw new AppException(ErrorCode.HASTAG_CREATE_LIST_FAILED);
-        }
-
-
-
         Tweet tweet = Tweet.builder()
+                .user(optional.get())
                 .type(tweetRequest.getType())
                 .content(tweetRequest.getContent())
                 .audience(tweetRequest.getAudience())
+                .parentId(tweetRequest.getParentId())
+                .userViews(0)
+                .hastags(new ArrayList<>())
+                .images(new ArrayList<>())
+                .mentions(new ArrayList<>())
                 .build();
-        return tweetMapper.toResponse(tweetRepository.save(tweet));
-    }
 
-    public String storeFile(MultipartFile file) throws IOException {
-        Path uploadDir = Paths.get("src/main/resources/static/images");
+        TweetResponse tweetResponse = tweetMapper.toResponse(tweetRepository.saveAndFlush(tweet));
 
-        if (!Files.exists(uploadDir)) {
-            Files.createDirectories(uploadDir);
+        if (tweetRequest.getHastags() != null) {
+            int resultInsertHastag = hastagService.insertHasTags(tweetRequest.getHastags());
+            if (resultInsertHastag != 1) {
+                tweetRepository.deleteById(tweetResponse.getId());
+                throw new AppException(ErrorCode.HASTAG_CREATE_LIST_FAILED);
+            }
         }
 
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        Path destination = uploadDir.resolve(uniqueFilename);
-        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+        if (tweetRequest.getUsernames() != null) {
+            int resultInsertMention = mentionService.createTweetMention(tweetRequest.getUsernames(), tweetResponse.getId());
+            if (resultInsertMention != 1) {
+                tweetRepository.deleteById(tweetResponse.getId());
+                throw new AppException(ErrorCode.TWEET_MENTOIN_CREATE_LIST_FAILED);
+            }
+        }
 
-        return "images/" + uniqueFilename;
+        if (tweetRequest.getHastags() != null) {
+            int resultInsertTweetHastag = tweetHastagService.insertTweetHastag(tweetRequest.getHastags(), tweetResponse.getId());
+            if (resultInsertTweetHastag != 1) {
+                tweetRepository.deleteById(tweetResponse.getId());
+                throw new AppException(ErrorCode.TWEET_HASTAG_CREATE_LIST_FAILED);
+            }
+        }
+
+        if (tweetRequest.getTweetImages() != null) {
+            List<String> images = storeFile(tweetRequest.getTweetImages());
+            int resultInsertImage = tweetImageService.insertImage(images, tweetResponse.getId());
+            if (resultInsertImage != 1) {
+                tweetRepository.deleteById(tweetResponse.getId());
+                throw new AppException(ErrorCode.IMAGE_CREATE_LIST_FAILD);
+            }
+        }
+
+        return tweetResponse;
+    }
+
+    public List<String> storeFile(List<MultipartFile> listFile) throws IOException {
+        List<String> images = new ArrayList<>();
+        for (MultipartFile file : listFile) {
+            if (file != null) {
+                if (file.getSize() > 10 * 1024 * 1024) {
+                    throw new AppException(ErrorCode.IMAGE_SIZE_TOO_LARGE);
+                }
+                String contentType = file.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    throw new AppException(ErrorCode.IMAGE_NOT_EXACT_TYPE);
+                }
+            }
+            Path uploadDir = Paths.get("src/main/resources/static/images");
+
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+            }
+
+            String uniqueFilename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path destination = uploadDir.resolve(uniqueFilename);
+            Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+
+            String url = "images/" + uniqueFilename;
+            images.add(url);
+        }
+        return images;
     }
 
 }

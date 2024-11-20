@@ -3,6 +3,10 @@ package com.global.project.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -34,5 +38,14 @@ public class Tweet extends BaseEntity {
 
     @Column(name = "user_views")
     private Integer userViews;
+
+    @OneToMany(mappedBy = "tweet")
+    List<TweetImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tweet")
+    List<TweetMention> mentions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tweet")
+    List<TweetHastag> hastags = new ArrayList<>();
 
 }
