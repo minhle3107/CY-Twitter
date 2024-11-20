@@ -125,6 +125,7 @@ public class JwtProvider {
         }
         return null;
     }
+
     public String getUsernameFromJwt(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(JWT_SECRET_ACCESS_TOKEN)

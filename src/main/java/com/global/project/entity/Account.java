@@ -22,7 +22,7 @@ public class Account extends BaseEntity {
     private Long id;
 
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "username")
     private User user;
 
