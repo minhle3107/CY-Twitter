@@ -14,10 +14,12 @@ public class TweetHastag {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "tweet_id")
-    private Long tweetId;
+    @ManyToOne
+    @JoinColumn(name = "tweet_id")
+    private Tweet tweet;
 
-    @Column(name = "hastag_id")
-    private Long hastagId;
+    @JoinColumn(name ="hastag_name")
+    @ManyToOne
+    private Hastag hastag;
 
 }
