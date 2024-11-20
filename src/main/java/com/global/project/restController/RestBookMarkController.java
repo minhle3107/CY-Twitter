@@ -26,7 +26,7 @@ public class RestBookMarkController {
 
     @Operation(summary = "Bookmark or un bookmark", description = "Bookmark or un bookmark", tags = {"05. BOOKMARK"})
     @PostMapping("/bookmark-or-un-bookmark")
-    public ResponseEntity<ApiResponse<BookMarkResponse>> likeOrUnlike(@RequestBody BookMarkRequest bookMarkRequest) {
+    public ResponseEntity<ApiResponse<BookMarkResponse>> bookmarkOrUnBookmark(@RequestBody BookMarkRequest bookMarkRequest) {
         return iBookMarkService.bookMarkOrUnBookMark(bookMarkRequest);
     }
 }
