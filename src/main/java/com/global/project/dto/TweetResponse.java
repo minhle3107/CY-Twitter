@@ -1,12 +1,10 @@
 package com.global.project.dto;
 
 import com.global.project.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,7 +26,14 @@ public class TweetResponse {
 
     private Integer userViews;
 
+    List<TweetImageResponse> images;
+
+    List<TweetHastagResponse> hastags;
+
+    List<TweetMentionResponse> mentions;
+
     LocalDateTime createdAt;
 
     LocalDateTime updatedAt;
+
 }

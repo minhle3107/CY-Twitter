@@ -19,8 +19,9 @@ public class TweetMention {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "tweet_id")
-    private Long tweetId;
+    @ManyToOne
+    @JoinColumn(name = "tweet_id")
+    private Tweet tweet;
 
     @Size(max = 255)
     @Column(name = "mentioned_username")

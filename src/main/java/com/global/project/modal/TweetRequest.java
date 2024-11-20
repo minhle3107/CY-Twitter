@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,8 +19,8 @@ public class TweetRequest {
     int type;
     int audience;
     String content;
-    int parentId;
+    Long parentId;
     List<String> hastags;
-    List<String> tweetImages;
+    List<MultipartFile> tweetImages;
     List<String> usernames;
 }

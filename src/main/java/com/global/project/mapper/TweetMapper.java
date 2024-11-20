@@ -3,13 +3,22 @@ package com.global.project.mapper;
 import com.global.project.dto.TweetResponse;
 import com.global.project.entity.Tweet;
 import com.global.project.modal.TweetRequest;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TweetMapper {
+    TweetImageMapper tweetImageMapper;
+    TweetMentionMapper tweetMentionMapper;
+    TweetHastagMapper tweetHastagMapper;
+
     public Tweet toEntity(TweetRequest tweetRequest) {
         return Tweet.builder()
                 .type(tweetRequest.getType())
@@ -29,6 +38,9 @@ public class TweetMapper {
                 .createdAt(tweet.getCreatedAt())
                 .parentId(tweet.getParentId())
                 .userViews(tweet.getUserViews())
+                .images(tweetImageMapper.toListResponse(tweet.getImages()))
+                .hastags(tweetHastagMapper.toListResponse(tweet.getHastags()))
+                .mentions(tweetMentionMapper.toListResponse(tweet.getMentions()))
                 .build();
     }
 
