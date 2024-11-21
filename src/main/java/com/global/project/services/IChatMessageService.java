@@ -11,5 +11,7 @@ public interface IChatMessageService {
     ResponseEntity<ApiResponse<ChatMessageResponse>> save(ChatMessageRequest chatMessageRequest);
 
 
-    ResponseEntity<ApiResponse<List<ChatMessageResponse>>> findChatMessages(String senderId, String recipientId);
+//    ResponseEntity<ApiResponse<List<ChatMessageResponse>>> findChatMessages(String senderId, String recipientId);
+
+    ResponseEntity<ApiResponse<List<ChatMessageResponse>>> findChatMessages(String receiveUsername);
 }

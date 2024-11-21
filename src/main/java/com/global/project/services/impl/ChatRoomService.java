@@ -3,102 +3,105 @@ package com.global.project.services.impl;
 import com.global.project.configuration.jwtConfig.JwtProvider;
 import com.global.project.dto.ChatRoomResponse;
 import com.global.project.entity.ChatRoom;
-import com.global.project.exception.AppException;
-import com.global.project.exception.ErrorCode;
-import com.global.project.mapper.ChatRoomMapper;
-import com.global.project.modal.ChatRoomRequest;
-import com.global.project.repository.IChatRoomRepository;
+import com.global.project.entity.User;
+import com.global.project.repository.ChatRoomRepository;
 import com.global.project.repository.UserRepository;
 import com.global.project.services.IChatRoomService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatRoomService implements IChatRoomService {
 
+    private final ChatRoomRepository chatRoomRepository;
+    private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
 
-    private final IChatRoomRepository iChatRoomRepository;
-
-    private final UserRepository userRepository;
-
-
-    public ChatRoomService(JwtProvider jwtProvider, IChatRoomRepository iChatRoomRepository, UserRepository userRepository) {
-        this.jwtProvider = jwtProvider;
-        this.iChatRoomRepository = iChatRoomRepository;
+    @Autowired
+    public ChatRoomService(ChatRoomRepository chatRoomRepository, UserRepository userRepository, JwtProvider jwtProvider) {
+        this.chatRoomRepository = chatRoomRepository;
         this.userRepository = userRepository;
+        this.jwtProvider = jwtProvider;
     }
-
-
-    private boolean usernameExists(String username) {
-        return !userRepository.existsByUsername(username);
-    }
-
 
 //    @Override
-//    public ResponseEntity<ApiResponse<ChatRoomResponse>> save(ChatRoomRequest chatRoomRequest) {
-//        String senderUsername = jwtProvider.getUsernameContext();
+//    public ResponseEntity<ChatRoomResponse> createChatRoom(ChatRoomRequest chatRoomRequest) {
 //        String receiveUsername = chatRoomRequest.getReceiveUsername();
+//        String senderUsername = jwtProvider.getUsernameContext();
 //
-//        if (usernameExists(senderUsername) || usernameExists(receiveUsername)) {
-//            throw new AppException(ErrorCode.USER_NOT_FOUND);
+//        Optional<User> receiveUserOpt = userRepository.findById(receiveUsername);
+//        if (receiveUserOpt.isEmpty()) {
+//            return ResponseEntity.badRequest().body(null);
 //        }
 //
-//        return checkChatRoom(senderUsername, receiveUsername);
-//    }
+//        ChatRoom chatRoom = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername)
+//                .orElseGet(() -> chatRoomRepository.save(ChatRoom.builder()
+//                        .senderUsername(senderUsername)
+//                        .receiveUsername(receiveUsername)
+//                        .build()));
 //
-//    private ResponseEntity<ApiResponse<ChatRoomResponse>> checkChatRoom(String senderUsername, String receiveUsername) {
-//        ChatRoom chatRoom = iChatRoomRepository.findByUsers(senderUsername, receiveUsername);
+//        User receiveUser = receiveUserOpt.get();
 //
-//        if (chatRoom == null) {
-//            return createChatRoom(senderUsername, receiveUsername);
-//        }
+//        ChatRoomResponse response = ChatRoomResponse.builder()
+//                .id(chatRoom.getId())
+//                .senderUsername(chatRoom.getSenderUsername())
+//                .receiveUsername(chatRoom.getReceiveUsername())
+//                .receiveName(receiveUser.getName())
+//                .receiveUserAvatar(receiveUser.getAvatar())
+//                .createdAt(chatRoom.getCreatedAt())
+//                .build();
 //
-//        return ResponseEntity.ok(ApiResponse.<ChatRoomResponse>builder()
-//                .message("Chat Room already exists")
-//                .data(ChatRoomMapper.toDto(chatRoom))
-//                .build());
-//    }
-//
-//    private ResponseEntity<ApiResponse<ChatRoomResponse>> createChatRoom(String senderUsername, String receiveUsername) {
-//        ChatRoom chatRoom = iChatRoomRepository.save(ChatRoom.builder()
-//                .senderUsername(senderUsername)
-//                .receiveUsername(receiveUsername)
-//                .build());
-//
-//        return ResponseEntity.ok(ApiResponse.<ChatRoomResponse>builder()
-//                .message("Chat Room created successfully")
-//                .data(ChatRoomMapper.toDto(chatRoom))
-//                .build());
+//        return ResponseEntity.ok(response);
 //    }
 
     @Override
-    public ChatRoomResponse save(ChatRoomRequest chatRoomRequest) {
+    public ResponseEntity<List<ChatRoomResponse>> getChatRooms() {
         String senderUsername = jwtProvider.getUsernameContext();
-        String receiveUsername = chatRoomRequest.getReceiveUsername();
 
-        if (usernameExists(senderUsername) || usernameExists(receiveUsername)) {
-            throw new AppException(ErrorCode.USER_NOT_FOUND);
-        }
+        List<ChatRoom> chatRooms = chatRoomRepository.findBySenderUsername(senderUsername);
+        List<ChatRoomResponse> responses = chatRooms.stream().map(chatRoom -> {
+            Optional<User> receiveUserOpt = userRepository.findById(chatRoom.getReceiveUsername());
+            User receiveUser = receiveUserOpt.orElse(new User());
+            return ChatRoomResponse.builder()
+                    .id(chatRoom.getId())
+                    .senderUsername(chatRoom.getSenderUsername())
+                    .receiveUsername(chatRoom.getReceiveUsername())
+                    .receiveName(receiveUser.getName())
+                    .receiveUserAvatar(receiveUser.getAvatar())
+                    .createdAt(chatRoom.getCreatedAt())
+                    .build();
+        }).collect(Collectors.toList());
 
-        return checkChatRoom(senderUsername, receiveUsername);
+        return ResponseEntity.ok(responses);
     }
 
-    private ChatRoomResponse checkChatRoom(String senderUsername, String receiveUsername) {
-        ChatRoom chatRoom = iChatRoomRepository.findByUsers(senderUsername, receiveUsername);
 
-        if (chatRoom == null) {
-            return createChatRoom(senderUsername, receiveUsername);
+    @Override
+    public ResponseEntity<ChatRoomResponse> getChatRoomDetails(String receiveUsername) {
+        String senderUsername = jwtProvider.getUsernameContext();
+        Optional<ChatRoom> chatRoomOpt = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername);
+        if (chatRoomOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
 
-        return ChatRoomMapper.toDto(chatRoom);
-    }
+        ChatRoom chatRoom = chatRoomOpt.get();
+        Optional<User> receiveUserOpt = userRepository.findById(chatRoom.getReceiveUsername());
+        User receiveUser = receiveUserOpt.orElse(new User());
 
-    private ChatRoomResponse createChatRoom(String senderUsername, String receiveUsername) {
-        ChatRoom chatRoom = iChatRoomRepository.save(ChatRoom.builder()
-                .senderUsername(senderUsername)
-                .receiveUsername(receiveUsername)
-                .build());
+        ChatRoomResponse response = ChatRoomResponse.builder()
+                .id(chatRoom.getId())
+                .senderUsername(chatRoom.getSenderUsername())
+                .receiveUsername(chatRoom.getReceiveUsername())
+                .receiveName(receiveUser.getName())
+                .receiveUserAvatar(receiveUser.getAvatar())
+                .createdAt(chatRoom.getCreatedAt())
+                .build();
 
-        return ChatRoomMapper.toDto(chatRoom);
+        return ResponseEntity.ok(response);
     }
 }

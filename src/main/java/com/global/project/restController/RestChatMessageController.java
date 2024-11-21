@@ -2,48 +2,31 @@ package com.global.project.restController;
 
 import com.global.project.dto.ApiResponse;
 import com.global.project.dto.ChatMessageResponse;
-import com.global.project.dto.ChatNotificationResponse;
 import com.global.project.modal.ChatMessageRequest;
-import com.global.project.services.impl.ChatMessageService;
+import com.global.project.services.IChatMessageService;
+import com.global.project.utils.Const;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RestController
+@RequestMapping(value = Const.PREFIX_VERSION + "/chat")
 public class RestChatMessageController {
 
-    private final SimpMessagingTemplate messagingTemplate;
-    private final ChatMessageService chatMessageService;
+    private final IChatMessageService chatMessageService;
 
-    public RestChatMessageController(SimpMessagingTemplate messagingTemplate, ChatMessageService chatMessageService) {
-        this.messagingTemplate = messagingTemplate;
+    public RestChatMessageController(IChatMessageService chatMessageService) {
         this.chatMessageService = chatMessageService;
     }
 
-    @MessageMapping("/chat")
-    public void processMessage(@Payload ChatMessageRequest chatMessageRequest) {
-        ResponseEntity<ApiResponse<ChatMessageResponse>> savedMsg = chatMessageService.save(chatMessageRequest);
-
-        ChatMessageResponse chatMessageResponse = savedMsg.getBody().getData();
-        messagingTemplate.convertAndSendToUser(
-                chatMessageRequest.getReceiveUsername(), "/queue/messages",
-                new ChatNotificationResponse(
-                        chatMessageResponse.getId(),
-                        chatMessageResponse.getSenderUsername(),
-                        chatMessageResponse.getReceiveUsername(),
-                        chatMessageResponse.getContent()
-                )
-        );
+    @PostMapping("/message")
+    public ResponseEntity<ApiResponse<ChatMessageResponse>> sendMessage(@RequestBody ChatMessageRequest chatMessageRequest) {
+        return chatMessageService.save(chatMessageRequest);
     }
 
-    @GetMapping("/messages/{senderId}/{recipientId}")
-    public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> findChatMessages(@PathVariable String senderId,
-                                                                                   @PathVariable String recipientId) {
-        return chatMessageService.findChatMessages(senderId, recipientId);
+    @GetMapping("/messages")
+    public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> getMessages(@RequestParam String receiveUsername) {
+        return chatMessageService.findChatMessages(receiveUsername);
     }
-
 }

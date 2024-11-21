@@ -10,7 +10,8 @@ public class ChatMessageMapper {
     public static ChatMessageResponse toDto(ChatMessage chatMessage) {
         return ChatMessageResponse.builder()
                 .id(chatMessage.getId())
-                .senderUsername(chatMessage.getSender().getUsername())
+                .senderUsername(chatMessage.getSenderUsername())
+                .receiveUsername(chatMessage.getReceiveUsername())
                 .content(chatMessage.getContent())
                 .createdAt(chatMessage.getCreatedAt())
                 .build();

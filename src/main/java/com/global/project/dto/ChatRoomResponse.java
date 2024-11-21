@@ -11,12 +11,9 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatRoomResponse {
     private Long id;
-
     private String senderUsername;
-
     private String receiveUsername;
-
+    private String receiveName;
+    private String receiveUserAvatar;
     private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 }

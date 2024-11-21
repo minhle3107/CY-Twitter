@@ -1,32 +1,39 @@
 package com.global.project.restController;
 
-import com.global.project.dto.ApiResponse;
 import com.global.project.dto.ChatRoomResponse;
-import com.global.project.modal.ChatRoomRequest;
 import com.global.project.services.IChatRoomService;
 import com.global.project.utils.Const;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "06. CHAT ROOM")
+import java.util.List;
+
 @RestController
-@RequestMapping(value = Const.PREFIX_VERSION + "/chat-rooms")
+@RequestMapping(value = Const.PREFIX_VERSION + "/chat/rooms")
 public class RestChatRoomController {
 
-    private final IChatRoomService iChatRoomService;
+    private final IChatRoomService chatRoomService;
 
-    public RestChatRoomController(IChatRoomService iChatRoomService) {
-        this.iChatRoomService = iChatRoomService;
+    public RestChatRoomController(IChatRoomService chatRoomService) {
+        this.chatRoomService = chatRoomService;
     }
 
-    @Operation(summary = "Create Chat Room", description = "Create Chat Room", tags = {"06. CHAT ROOM"})
-    @PostMapping("")
-    public ResponseEntity<ApiResponse<ChatRoomResponse>> save(@RequestBody ChatRoomRequest chatRoomRequest) {
-        return iChatRoomService.save(chatRoomRequest);
+//    @PostMapping
+//    public ResponseEntity<ChatRoomResponse> createChatRoom(@RequestBody ChatRoomRequest chatRoomRequest) {
+//        return chatRoomService.createChatRoom(chatRoomRequest);
+//    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ChatRoomResponse>> getChatRooms() {
+        return chatRoomService.getChatRooms();
+    }
+
+
+    @GetMapping()
+    public ResponseEntity<ChatRoomResponse> getChatRoomDetails(@RequestParam String receiveUsername) {
+        return chatRoomService.getChatRoomDetails(receiveUsername);
     }
 }

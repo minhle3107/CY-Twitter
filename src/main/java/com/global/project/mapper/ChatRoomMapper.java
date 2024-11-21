@@ -11,7 +11,6 @@ public class ChatRoomMapper {
                 .senderUsername(chatRoom.getSenderUsername())
                 .receiveUsername(chatRoom.getReceiveUsername())
                 .createdAt(chatRoom.getCreatedAt())
-                .updatedAt(chatRoom.getUpdatedAt())
                 .build();
     }
 }

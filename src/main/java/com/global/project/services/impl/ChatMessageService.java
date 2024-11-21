@@ -3,75 +3,105 @@ package com.global.project.services.impl;
 import com.global.project.configuration.jwtConfig.JwtProvider;
 import com.global.project.dto.ApiResponse;
 import com.global.project.dto.ChatMessageResponse;
-import com.global.project.dto.ChatRoomResponse;
 import com.global.project.entity.ChatMessage;
+import com.global.project.entity.ChatRoom;
+import com.global.project.entity.User;
 import com.global.project.mapper.ChatMessageMapper;
 import com.global.project.modal.ChatMessageRequest;
-import com.global.project.modal.ChatRoomRequest;
-import com.global.project.repository.IChatMessageRepository;
+import com.global.project.repository.ChatMessageRepository;
+import com.global.project.repository.ChatRoomRepository;
+import com.global.project.repository.UserRepository;
 import com.global.project.services.IChatMessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ChatMessageService implements IChatMessageService {
 
-    private final IChatMessageRepository iChatMessageRepository;
-
-    private final ChatRoomService chatRoomService;
-
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
+    private final SimpMessagingTemplate messagingTemplate;
 
-
-    public ChatMessageService(IChatMessageRepository iChatMessageRepository, ChatRoomService chatRoomService, JwtProvider jwtProvider) {
-        this.iChatMessageRepository = iChatMessageRepository;
-        this.chatRoomService = chatRoomService;
+    @Autowired
+    public ChatMessageService(ChatMessageRepository chatMessageRepository, ChatRoomRepository chatRoomRepository, UserRepository userRepository, JwtProvider jwtProvider, SimpMessagingTemplate messagingTemplate) {
+        this.chatMessageRepository = chatMessageRepository;
+        this.chatRoomRepository = chatRoomRepository;
+        this.userRepository = userRepository;
         this.jwtProvider = jwtProvider;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
     public ResponseEntity<ApiResponse<ChatMessageResponse>> save(ChatMessageRequest chatMessageRequest) {
-
         String receiveUsername = chatMessageRequest.getReceiveUsername();
         String content = chatMessageRequest.getContent();
 
-        ChatRoomRequest chatRoomRequest = ChatRoomRequest.builder()
-                .receiveUsername(receiveUsername)
-                .build();
-
-        ChatRoomResponse chatRoomResponse = chatRoomService.save(chatRoomRequest);
-
-        Long chatRoomId = chatRoomResponse.getId();
+        Optional<User> receiveUserOpt = userRepository.findById(receiveUsername);
+        if (receiveUserOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.<ChatMessageResponse>builder()
+                    .message("User not found")
+                    .build());
+        }
 
         String senderUsername = jwtProvider.getUsernameContext();
 
+        Optional<ChatRoom> chatRoomOpt = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername);
+        if (chatRoomOpt.isEmpty()) {
+            chatRoomRepository.save(ChatRoom.builder()
+                    .senderUsername(senderUsername)
+                    .receiveUsername(receiveUsername)
+                    .build());
+
+            chatRoomRepository.save(ChatRoom.builder()
+                    .senderUsername(receiveUsername)
+                    .receiveUsername(senderUsername)
+                    .build());
+        }
+
+        ChatRoom chatRoom = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername)
+                .orElseGet(() -> chatRoomRepository.findBySenderUsernameAndReceiveUsername(receiveUsername, senderUsername).get());
+
         ChatMessage chatMessage = ChatMessage.builder()
-                .chatRoomId(chatRoomId)
+                .chatRoom(chatRoom)
                 .senderUsername(senderUsername)
                 .receiveUsername(receiveUsername)
                 .content(content)
+                .createdAt(LocalDateTime.now())
                 .build();
 
+        ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
+
+        messagingTemplate.convertAndSendToUser(receiveUsername, "/queue/notifications", "New message from " + senderUsername);
+
         return ResponseEntity.ok(ApiResponse.<ChatMessageResponse>builder()
-                .message("Chat Room already exists")
-                .data(ChatMessageMapper.toDto(iChatMessageRepository.save(chatMessage)))
+                .message("Message sent")
+                .data(ChatMessageMapper.toDto(savedMessage))
                 .build());
     }
 
     @Override
-    public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> findChatMessages(String senderId, String recipientId) {
+    public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> findChatMessages(String receiveUsername) {
+        String senderUsername = jwtProvider.getUsernameContext();
 
-        ChatRoomRequest chatRoomRequest = ChatRoomRequest.builder()
-                .receiveUsername(recipientId)
-                .build();
+        Optional<ChatRoom> chatRoomOpt = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername);
+        if (chatRoomOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.<List<ChatMessageResponse>>builder()
+                    .message("Chat room not found")
+                    .build());
+        }
 
-        ChatRoomResponse chatRoomResponse = chatRoomService.save(chatRoomRequest);
-
-        Long chatRoomId = chatRoomResponse.getId();
-
-
-        return null;
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoomOpt.get().getId());
+        return ResponseEntity.ok(ApiResponse.<List<ChatMessageResponse>>builder()
+                .message("Messages retrieved")
+                .data(ChatMessageMapper.toDtoList(chatMessages))
+                .build());
     }
 }
