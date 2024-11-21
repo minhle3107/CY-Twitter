@@ -7,7 +7,9 @@ import com.global.project.modal.SignupRequest;
 import org.springframework.http.ResponseEntity;
 
 public interface IAccountService {
-    AccountResponse registerAccount(SignupRequest signupRequest);
+    ApiResponse<AccountResponse> registerAccount(SignupRequest signupRequest);
+
     ResponseEntity<ApiResponse<AccountResponse>> getMe();
+
     ResponseEntity<ApiResponse<UserResponse>> getMe1();
 }

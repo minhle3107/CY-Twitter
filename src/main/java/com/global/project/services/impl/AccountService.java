@@ -28,6 +28,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -36,6 +37,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Transactional
 public class AccountService implements IAccountService, UserDetailsService {
     AccountRepository accountRepository;
     RoleRepository roleRepository;
@@ -44,6 +46,7 @@ public class AccountService implements IAccountService, UserDetailsService {
     AccountMapper accountMapper;
     JwtProvider _jwtProvider;
     UserMapper userMapper;
+    ViaCodeService viaCodeService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -51,40 +54,48 @@ public class AccountService implements IAccountService, UserDetailsService {
     }
 
     @Override
-    public AccountResponse registerAccount(SignupRequest signupRequest) {
-        if (userRepository.existsByUsername(signupRequest.getUsername())) {
-            throw new AppException(ErrorCode.USER_USERNAME_EXISTED);
-        }
-        if (accountRepository.existsByEmail(signupRequest.getEmail())) {
-            throw new AppException(ErrorCode.ACCOUNT_EMAIL_EXISTED);
-        }
+    public ApiResponse<AccountResponse> registerAccount(SignupRequest signupRequest) {
+        if (viaCodeService.validateCode(signupRequest.getCode(), signupRequest.getEmail())) {
+            if (userRepository.existsByUsername(signupRequest.getUsername())) {
+                throw new AppException(ErrorCode.USER_USERNAME_EXISTED);
+            }
+            if (accountRepository.existsByEmail(signupRequest.getEmail())) {
+                throw new AppException(ErrorCode.ACCOUNT_EMAIL_EXISTED);
+            }
 
-        User user = User.builder()
-                .username(signupRequest.getUsername())
-                .name(signupRequest.getName())
-                .gender(signupRequest.getGender())
-                .dob(signupRequest.getDob())
-                .isActive(true)
-                .build();
+            User user = User.builder()
+                    .username(signupRequest.getUsername())
+                    .name(signupRequest.getName())
+                    .gender(signupRequest.getGender())
+                    .dob(signupRequest.getDob())
+                    .isActive(true)
+                    .build();
 
-        User insertUser = userRepository.saveAndFlush(user);
+            User insertUser = userRepository.saveAndFlush(user);
 
-        if (insertUser == null) {
-            throw new AppException(ErrorCode.USER_CANT_CREATE_USER);
+            if (insertUser == null) {
+                throw new AppException(ErrorCode.USER_CANT_CREATE_USER);
+            }
+
+            Role role = roleRepository.findByName(Const.ROLE_USER);
+            if (role == null) {
+                throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+            }
+
+            Account account = Account.builder()
+                    .user(insertUser)
+                    .password(passwordEncoder.encode(signupRequest.getPassword()))
+                    .email(signupRequest.getEmail())
+                    .role(role)
+                    .isActive(true)
+                    .build();
+            return ApiResponse.<AccountResponse>builder()
+                    .data(accountMapper.toResponse(accountRepository.save(account)))
+                    .message("register successfully")
+                    .build();
+        } else {
+            throw new AppException(ErrorCode.REGISTER_ACCOUNT_FAILED);
         }
-        Role role = roleRepository.findByName(Const.ROLE_USER);
-        if (role == null) {
-            throw new AppException(ErrorCode.ROLE_NOT_FOUND);
-        }
-        Account account = Account.builder()
-                .user(insertUser)
-                .password(passwordEncoder.encode(signupRequest.getPassword()))
-                .email(signupRequest.getEmail())
-                .role(role)
-                .isActive(true)
-                .build();
-
-        return accountMapper.toResponse(accountRepository.save(account));
     }
 
     @Override

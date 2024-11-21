@@ -3,6 +3,7 @@ package com.global.project.services;
 import com.global.project.dto.ApiResponse;
 import com.global.project.dto.TweetResponse;
 import com.global.project.modal.TweetRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;

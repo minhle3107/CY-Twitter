@@ -1,10 +1,12 @@
 package com.global.project.restController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.global.project.dto.ApiResponse;
 import com.global.project.modal.TweetRequest;
 import com.global.project.services.impl.TweetService;
 import com.global.project.utils.Const;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.annotation.MultipartConfig;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -12,7 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.DataInput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -20,31 +24,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Tag(name = "03. Tweet")
+@MultipartConfig
 public class TweetController {
     TweetService tweetService;
+    ObjectMapper objectMapper;
 
-    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<?> createTweet(@RequestParam("username") String username,
-                                      @RequestParam(value = "type", defaultValue = "1") int type,
-                                      @RequestParam(value = "audience", defaultValue = "1") int audience,
-                                      @RequestParam("content") String content,
-                                      @RequestParam(value = "parentId", defaultValue = "0") Long parentId,
-                                      @RequestParam(value = "hashtags", required = false) List<String> hashtags,
-                                      @RequestParam(value = "tweetImages", required = false) List<MultipartFile> tweetImages,
-                                      @RequestParam(value = "usernames", required = false) List<String> usernames) throws IOException {
-
-        TweetRequest tweetRequest = TweetRequest.builder()
-                .username(username)
-                .audience(audience)
-                .content(content)
-                .parentId(parentId)
-                .hastags(hashtags)
-                .tweetImages(tweetImages)
-                .usernames(usernames)
-                .audience(audience)
-                .type(type)
-                .build();
-
+    @PostMapping(value = "")
+    public ApiResponse<?> createTweet( TweetRequest tweetRequest) throws IOException {
         return ApiResponse.builder()
                 .data(tweetService.createTweet(tweetRequest))
                 .message("Created tweet successfully")
@@ -61,8 +47,6 @@ public class TweetController {
     public ApiResponse<?> getTweetPagination(@RequestParam int pageSize, @RequestParam int pageNumber) {
         return tweetService.getAllTweetsPagination(pageSize, pageNumber);
     }
-
-
 
 
 }

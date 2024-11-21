@@ -100,8 +100,8 @@ public class TweetService implements ITweetService {
             }
         }
 
-        if (tweetRequest.getTweetImages() != null) {
-            List<String> images = storeFile(tweetRequest.getTweetImages());
+        if (tweetRequest.getFiles() != null) {
+            List<String> images = storeFile(tweetRequest.getFiles());
             int resultInsertImage = tweetImageService.insertImage(images, tweetResponse.getId());
             if (resultInsertImage != 1) {
                 tweetRepository.deleteById(tweetResponse.getId());
