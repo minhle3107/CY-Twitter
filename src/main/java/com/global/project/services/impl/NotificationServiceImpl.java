@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 
 @Service
 public class NotificationServiceImpl implements INotificationService {
-    private final NotificationMapper _mapper;
-    private final INotificationRepository _repository;
-    private final SimpMessagingTemplate _messagingTemplate;
+    private  NotificationMapper _mapper;
+    private  INotificationRepository _repository;
+    private  SimpMessagingTemplate _messagingTemplate;
 
     public NotificationServiceImpl(INotificationRepository repository,
                                    NotificationMapper mapper,
