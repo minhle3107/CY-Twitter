@@ -26,6 +26,16 @@ public class TweetResponse {
 
     private Integer userViews;
 
+    private Long retweetCount;
+
+    private Long replyCount;
+
+    private Long bookMarkCount;
+
+    private Long quoteCount;
+
+    private Long likeCount;
+
     List<TweetImageResponse> images;
 
     List<TweetHastagResponse> hastags;
