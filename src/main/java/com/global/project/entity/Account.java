@@ -3,10 +3,6 @@ package com.global.project.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
