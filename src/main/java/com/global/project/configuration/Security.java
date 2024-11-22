@@ -72,10 +72,10 @@ public class Security {
                                         .requestMatchers(new AntPathRequestMatcher("/public/**"),
                                                 new AntPathRequestMatcher("/error"),
                                                 new AntPathRequestMatcher("/auth/**"),
-                                new AntPathRequestMatcher("/ws/**"),
-                                                new AntPathRequestMatcher("/**")
+                                                new AntPathRequestMatcher("/**"),
+                                                new AntPathRequestMatcher("/ws/**")
 
-                                                )
+                                        )
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated()
