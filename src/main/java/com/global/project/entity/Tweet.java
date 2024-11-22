@@ -38,12 +38,12 @@ public class Tweet extends BaseEntity {
     @Column(name = "user_views")
     private Integer userViews;
 
-    @OneToMany(mappedBy = "tweet")
+    @OneToMany(mappedBy = "tweet", fetch = FetchType.EAGER)
     List<TweetImage> images = new ArrayList<>();
 
-    @OneToMany(mappedBy = "tweet")
+    @OneToMany(mappedBy = "tweet", fetch = FetchType.EAGER)
     List<TweetMention> mentions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "tweet")
+    @OneToMany(mappedBy = "tweet", fetch = FetchType.EAGER)
     List<TweetHastag> hastags = new ArrayList<>();
 }
