@@ -34,7 +34,7 @@ public class WebSocketEventListener {
             activeUsers.put(username, true);
             System.out.println("User Connected: " + username);
 
-            // Gửi lại tin nhắn chưa được gửi
+            // Send undelivered messages
             List<ChatMessage> undeliveredMessages = chatMessageRepository.findByReceiveUsernameAndDeliveredFalse(username);
             for (ChatMessage message : undeliveredMessages) {
                 messagingTemplate.convertAndSendToUser(username, "/queue/messages", message);
