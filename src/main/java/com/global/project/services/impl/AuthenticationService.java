@@ -9,7 +9,7 @@ import com.global.project.exception.ErrorCode;
 import com.global.project.mapper.AccountMapper;
 import com.global.project.modal.ChangePasswrodRequest;
 import com.global.project.repository.AccountRepository;
-import com.global.project.repository.VIaCodeRepository;
+import com.global.project.repository.ViaCodeRepository;
 import com.global.project.services.IAuthenticationService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -34,7 +34,7 @@ import java.util.Random;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService implements IAuthenticationService {
     JavaMailSender javaMailSender;
-    VIaCodeRepository viaCodeRepository;
+    ViaCodeRepository viaCodeRepository;
     AccountRepository accountRepository;
     JwtProvider jwtProvider;
     PasswordEncoder passwordEncoder;

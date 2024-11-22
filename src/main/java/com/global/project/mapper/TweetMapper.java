@@ -6,6 +6,7 @@ import com.global.project.modal.TweetRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -51,4 +52,5 @@ public class TweetMapper {
         }
         return tweets.stream().map(this::toResponse).toList();
     }
+
 }

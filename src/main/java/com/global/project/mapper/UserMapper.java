@@ -1,8 +1,8 @@
 package com.global.project.mapper;
 
-import com.global.project.dto.AccountResponse;
 import com.global.project.dto.UserResponse;
 import com.global.project.entity.Account;
+import com.global.project.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,4 +22,21 @@ public class UserMapper {
                 .role(account.getRole().getName())
                 .build();
     }
+
+    public UserResponse toResponse(User user) {
+        return UserResponse.builder()
+                .username(user.getUsername())
+                .name(user.getName())
+                .avatar(user.getAvatar())
+                .coverPhoto(user.getCoverPhoto())
+                .gender(user.getGender())
+                .location(user.getLocation())
+                .website(user.getWebsite())
+                .dob(user.getDob())
+                .bio(user.getBio())
+                .email(null)
+                .role(null)
+                .build();
+    }
+
 }
