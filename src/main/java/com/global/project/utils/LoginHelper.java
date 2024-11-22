@@ -161,6 +161,7 @@ public class LoginHelper {
                 .dob(modelAccountGoogle.getDob())
                 .avatar(modelAccountGoogle.getAvatar())
                 .isActive(true)
+                .avatar("images/cd207dcb-364f-4251-a9d2-8864719bf42f_img2.jpg")
                 .build();
 
         User insertUser = userRepository.saveAndFlush(user);

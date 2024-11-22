@@ -1,12 +1,11 @@
 package com.global.project.restController;
 
 import com.global.project.dto.ApiResponse;
-import com.global.project.entity.Account;
+import com.global.project.dto.SignInResponse;
 import com.global.project.modal.ChangePasswrodRequest;
 import com.global.project.modal.LogoutRequest;
 import com.global.project.modal.SignInRequest;
 import com.global.project.modal.SignupRequest;
-import com.global.project.repository.AccountRepository;
 import com.global.project.services.IAccountService;
 import com.global.project.services.IAuthService;
 import com.global.project.services.IAuthenticationService;
@@ -16,10 +15,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @Tag(name = "01. AUTH")
 @RestController
@@ -81,13 +82,21 @@ public class RestAuthController {
     }
 
     @GetMapping("/oauth/google")
-    public ApiResponse<?> hanldeLoginWithGoogle(@RequestParam("code") String code,
-                                                @RequestParam("scope") String scope,
-                                                @RequestParam("authuser") String authUser,
-                                                @RequestParam("prompt") String prompt) {
-        return ApiResponse.builder()
-                .data(loginHelper.processGrantCode(code))
-                .build();
+    public void hanldeLoginWithGoogle(@RequestParam("code") String code,
+                                      @RequestParam("scope") String scope,
+                                      @RequestParam("authuser") String authUser,
+                                      @RequestParam("prompt") String prompt,
+                                      HttpServletResponse response) throws IOException {
+
+        SignInResponse signInResponse = loginHelper.processGrantCode(code);
+        if (signInResponse != null) {
+            String redirectUrl = "http://localhost:5173/login-success?token=" + signInResponse.getAccountToken()
+                    + "&refreshToken=" + signInResponse.getRefreshToken();
+            response.sendRedirect(redirectUrl);
+        } else {
+            String redirectUrl = "http://localhost:5173/login-success";
+            response.sendRedirect(redirectUrl);
+        }
     }
 
 }

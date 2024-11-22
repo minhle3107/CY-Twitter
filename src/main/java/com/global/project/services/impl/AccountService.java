@@ -69,6 +69,7 @@ public class AccountService implements IAccountService, UserDetailsService {
                     .gender(signupRequest.getGender())
                     .dob(signupRequest.getDob())
                     .isActive(true)
+                    .avatar("images/cd207dcb-364f-4251-a9d2-8864719bf42f_img2.jpg")
                     .build();
 
             User insertUser = userRepository.saveAndFlush(user);
@@ -89,6 +90,7 @@ public class AccountService implements IAccountService, UserDetailsService {
                     .role(role)
                     .isActive(true)
                     .build();
+
             return ApiResponse.<AccountResponse>builder()
                     .data(accountMapper.toResponse(accountRepository.save(account)))
                     .message("register successfully")

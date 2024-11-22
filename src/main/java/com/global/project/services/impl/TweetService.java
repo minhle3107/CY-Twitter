@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -134,9 +135,10 @@ public class TweetService implements ITweetService {
         pageNumber = Math.max(pageNumber - 1, 0);
         pageSize = Math.min(pageSize, 10);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<TweetResponse> listTweetReponse = tweetMapper.toListResponse(tweetRepository.findAll(pageable).getContent());
+        List<TweetResponse> listTweetResponse = tweetMapper.toListResponse(
+                tweetRepository.findAllTweet(PageRequest.of(pageNumber, pageSize)));
         return ApiResponse.<List<TweetResponse>>builder()
-                .data(addInfoTweetResponse(listTweetReponse))
+                .data(addInfoTweetResponse(listTweetResponse))
                 .message("get tweet with panigation successfully")
                 .build();
     }
