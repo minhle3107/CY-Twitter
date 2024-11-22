@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,11 +70,10 @@ public class ChatMessageService implements IChatMessageService {
                 .orElseGet(() -> chatRoomRepository.findBySenderUsernameAndReceiveUsername(receiveUsername, senderUsername).get());
 
         ChatMessage chatMessage = ChatMessage.builder()
-                .chatRoom(chatRoom)
+                .chatRoomId(chatRoom.getId())
                 .senderUsername(senderUsername)
                 .receiveUsername(receiveUsername)
                 .content(content)
-                .createdAt(LocalDateTime.now())
                 .build();
 
         ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
@@ -87,18 +86,42 @@ public class ChatMessageService implements IChatMessageService {
                 .build());
     }
 
+//    @Override
+//    public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> findChatMessages(String receiveUsername) {
+//        String senderUsername = jwtProvider.getUsernameContext();
+//
+//        Optional<ChatRoom> chatRoomOpt = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername);
+//        if (chatRoomOpt.isEmpty()) {
+//            return ResponseEntity.badRequest().body(ApiResponse.<List<ChatMessageResponse>>builder()
+//                    .message("Chat room not found")
+//                    .build());
+//        }
+//
+//        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoomOpt.get().getId());
+//        return ResponseEntity.ok(ApiResponse.<List<ChatMessageResponse>>builder()
+//                .message("Messages retrieved")
+//                .data(ChatMessageMapper.toDtoList(chatMessages))
+//                .build());
+//    }
+
     @Override
     public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> findChatMessages(String receiveUsername) {
         String senderUsername = jwtProvider.getUsernameContext();
 
-        Optional<ChatRoom> chatRoomOpt = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername);
-        if (chatRoomOpt.isEmpty()) {
+        Optional<ChatRoom> chatRoomOpt1 = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername);
+        Optional<ChatRoom> chatRoomOpt2 = chatRoomRepository.findBySenderUsernameAndReceiveUsername(receiveUsername, senderUsername);
+
+        if (chatRoomOpt1.isEmpty() && chatRoomOpt2.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.<List<ChatMessageResponse>>builder()
                     .message("Chat room not found")
                     .build());
         }
 
-        List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoomOpt.get().getId());
+        List<ChatMessage> chatMessages = chatRoomOpt1.map(chatRoom -> chatMessageRepository.findByChatRoomId(chatRoom.getId())).orElseGet(List::of);
+        chatMessages.addAll(chatRoomOpt2.map(chatRoom -> chatMessageRepository.findByChatRoomId(chatRoom.getId())).orElseGet(List::of));
+
+        chatMessages.sort(Comparator.comparing(ChatMessage::getId));
+
         return ResponseEntity.ok(ApiResponse.<List<ChatMessageResponse>>builder()
                 .message("Messages retrieved")
                 .data(ChatMessageMapper.toDtoList(chatMessages))

@@ -3,8 +3,6 @@ package com.global.project.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Setter
@@ -15,14 +13,13 @@ import java.time.LocalDateTime;
         @Index(name = "idx_sender_username", columnList = "sender_username"),
         @Index(name = "idx_receive_username", columnList = "receive_username")
 })
-public class ChatMessage {
+public class ChatMessage extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "chat_room_id", nullable = false)
-    private ChatRoom chatRoom;
+    @Column(name = "chat_room_id", nullable = false)
+    private Long chatRoomId;
 
     @Column(name = "sender_username", nullable = false)
     private String senderUsername;
@@ -33,6 +30,6 @@ public class ChatMessage {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private boolean delivered;
+
 }
