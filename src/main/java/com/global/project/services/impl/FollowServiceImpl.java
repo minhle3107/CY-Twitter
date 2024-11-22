@@ -43,19 +43,13 @@ public class FollowServiceImpl implements IFollowService {
             Optional<User> userToFollow = _userRepository.findByUsername(followRequest.getFollowed_userName());
             if (userToFollow.isEmpty()) {
                 return ResponseEntity.badRequest().body(
-                        ApiResponse.builder()
-                                .message("Người dùng bạn đang cố gắng theo dõi không tồn tại.")
-                                .build()
+                        ApiResponse.builder().message("User not found.").build()
                 );
             }
             Follower existingFollower = _followRepository.findByUsernameAndFollowedUsername(username, followRequest.getFollowed_userName());
             if (existingFollower != null) {
                 _followRepository.delete(existingFollower);
-                return ResponseEntity.ok(
-                        ApiResponse.builder()
-                                .message("Unfollowed successfully.")
-                                .build()
-                );
+                return ResponseEntity.ok(ApiResponse.builder().message("Unfollowed successfully.").build());
             }
             Follower newFollower = Follower.builder()
                     .username(username)
@@ -66,22 +60,20 @@ public class FollowServiceImpl implements IFollowService {
             NotificationRequest notificationRequest = NotificationRequest.builder()
                     .recipient(followRequest.getFollowed_userName())
                     .actor(username)
-                    .status(TypeStatus.FOLLOW)
+                    .type(TypeStatus.FOLLOW)
                     .content(username + " has followed you.")
                     .build();
+            _notificationService.pushNotification(followRequest.getFollowed_userName(), notificationRequest);
             _notificationService.createNotification(notificationRequest);
-            return ResponseEntity.ok(
-                    ApiResponse.builder()
-                            .message("Followed successfully.")
-                            .build()
-            );
+            return ResponseEntity.ok(ApiResponse.builder().message("Followed successfully.").build());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body(ApiResponse.builder()
-                            .message("Đã xảy ra lỗi khi theo dõi/bỏ theo dõi người dùng: " + e.getMessage())
-                            .build());
+            return ResponseEntity.internalServerError().body(
+                    ApiResponse.builder().message("Error: " + e.getMessage()).build()
+            );
         }
     }
+
+
     @Override
     public ResponseEntity<ApiResponse<?>> follow(FollowRequest followRequest) {
         try {

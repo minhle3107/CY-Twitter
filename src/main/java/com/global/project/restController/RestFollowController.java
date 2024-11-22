@@ -18,13 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
     public class RestFollowController {
     @Autowired
     private FollowServiceImpl service;
-    @PostMapping("/follow")
-    public ResponseEntity<?> follow(@RequestBody FollowRequest followRequest) {
-       return service.follow(followRequest);
-    }
-
     @PostMapping("/followFe1")
     public ResponseEntity<?> followFe1(@RequestBody FollowRequest followRequest) {
         return service.followFe1(followRequest);
+    }
+
+    @PostMapping("/follow")
+    public ResponseEntity<?> follow(@RequestBody FollowRequest followRequest) {
+
+        return service.follow(followRequest);
     }
 }
