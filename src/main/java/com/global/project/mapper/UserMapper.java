@@ -1,6 +1,5 @@
 package com.global.project.mapper;
 
-import com.global.project.dto.AccountResponse;
 import com.global.project.dto.UserResponse;
 import com.global.project.entity.Account;
 import com.global.project.entity.User;
