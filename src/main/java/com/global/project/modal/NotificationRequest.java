@@ -13,6 +13,6 @@ public class NotificationRequest {
     private String recipient;
     private String actor;
     private String content;
-    private TypeStatus status;
+    private TypeStatus type;
     private NotificationStatus notificationStatus;
 }
