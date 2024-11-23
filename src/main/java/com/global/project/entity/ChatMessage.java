@@ -30,6 +30,4 @@ public class ChatMessage extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    private boolean delivered;
-
 }

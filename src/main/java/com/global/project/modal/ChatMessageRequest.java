@@ -19,8 +19,6 @@ public class ChatMessageRequest {
 
     private String senderUsername;
 
-    private boolean delivered;
-
     @Schema(title = "content", example = "Hello World")
     @NotBlank
     private String content;

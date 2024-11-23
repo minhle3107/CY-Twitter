@@ -42,7 +42,7 @@ public class ChatMessageService implements IChatMessageService {
     @Override
     public ResponseEntity<ApiResponse<ChatMessageResponse>> save(ChatMessageRequest chatMessageRequest) {
         String receiveUsername = chatMessageRequest.getReceiveUsername();
-        String content = chatMessageRequest.getContent();
+        System.out.println("nhận: " + receiveUsername);
 
         Optional<User> receiveUserOpt = userRepository.findById(receiveUsername);
         if (receiveUserOpt.isEmpty()) {
@@ -51,7 +51,9 @@ public class ChatMessageService implements IChatMessageService {
                     .build());
         }
 
-        String senderUsername = jwtProvider.getUsernameContext();
+//        String senderUsername = jwtProvider.getUsernameContext();
+        String senderUsername = chatMessageRequest.getSenderUsername();
+        System.out.println(senderUsername);
 
         Optional<ChatRoom> chatRoomOpt = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername);
         if (chatRoomOpt.isEmpty()) {
@@ -69,16 +71,10 @@ public class ChatMessageService implements IChatMessageService {
         ChatRoom chatRoom = chatRoomRepository.findBySenderUsernameAndReceiveUsername(senderUsername, receiveUsername)
                 .orElseGet(() -> chatRoomRepository.findBySenderUsernameAndReceiveUsername(receiveUsername, senderUsername).get());
 
-        ChatMessage chatMessage = ChatMessage.builder()
-                .chatRoomId(chatRoom.getId())
-                .senderUsername(senderUsername)
-                .receiveUsername(receiveUsername)
-                .content(content)
-                .build();
+        ChatMessage chatMessage = ChatMessageMapper.toEntity(chatMessageRequest);
+        chatMessage.setChatRoomId(chatRoom.getId());
 
         ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
-
-        messagingTemplate.convertAndSendToUser(receiveUsername, "/queue/notifications", "New message from " + senderUsername);
 
         return ResponseEntity.ok(ApiResponse.<ChatMessageResponse>builder()
                 .message("Message sent")

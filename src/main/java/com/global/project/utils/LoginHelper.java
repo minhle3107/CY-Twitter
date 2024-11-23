@@ -30,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 @Transactional
@@ -136,9 +135,9 @@ public class LoginHelper {
 
         return ModelAccountGoogle.builder()
                 .name(jsonObject.get("email").toString().replace("\"", ""))
-                .username(jsonObject.get("name").toString().replace("\"", ""))
+                .username(jsonObject.get("email").toString().replace("\"", ""))
                 .email(jsonObject.get("email").toString().replace("\"", ""))
-                .password(UUID.randomUUID().toString())
+                .password("666666")
                 .avatar(jsonObject.get("picture").toString().replace("\"", ""))
                 .dob(LocalDate.now())
                 .gender(1)

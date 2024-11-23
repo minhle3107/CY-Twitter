@@ -1,11 +1,9 @@
 package com.global.project.restController;
 
-import com.global.project.entity.ChatRoom;
-import com.global.project.mapper.ChatMessageMapper;
 import com.global.project.modal.ChatMessageRequest;
-import com.global.project.repository.ChatMessageRepository;
-import com.global.project.repository.ChatRoomRepository;
+import com.global.project.services.IChatMessageService;
 import com.global.project.utils.WebSocketEventListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -15,40 +13,34 @@ import org.springframework.stereotype.Controller;
 public class ChatController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final IChatMessageService iChatMessageService;
 
-    public ChatController(SimpMessagingTemplate messagingTemplate, ChatMessageRepository chatMessageRepository, ChatRoomRepository chatRoomRepository) {
+
+    @Autowired
+    public ChatController(SimpMessagingTemplate messagingTemplate, IChatMessageService iChatMessageService) {
         this.messagingTemplate = messagingTemplate;
-        this.chatMessageRepository = chatMessageRepository;
-        this.chatRoomRepository = chatRoomRepository;
+        this.iChatMessageService = iChatMessageService;
     }
 
-    @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/public")
-    public void sendMessage(ChatMessageRequest chatMessageRequest) {
-        if (WebSocketEventListener.isUserConnected(chatMessageRequest.getReceiveUsername())) {
-            messagingTemplate.convertAndSendToUser(chatMessageRequest.getReceiveUsername(), "/queue/messages/" + chatMessageRequest.getChatRoomId(), chatMessageRequest);
-        } else {
-            chatMessageRequest.setDelivered(false);
-            chatMessageRepository.save(ChatMessageMapper.toEntity(chatMessageRequest));
+
+    @MessageMapping("/sendMessage")
+    @SendTo("/topic/messages")
+    public ChatMessageRequest sendMessage(ChatMessageRequest chatMessageRequest) {
+
+        // Lưu tin nhắn vào database
+        iChatMessageService.save(chatMessageRequest);
+
+        // Kiểm tra xem người nhận có online không
+        boolean isReceiverOnline = WebSocketEventListener.isUserConnected(chatMessageRequest.getReceiveUsername());
+
+        if (isReceiverOnline) {
+            // Gửi tin nhắn đến queue riêng của người nhận
+            messagingTemplate.convertAndSendToUser(
+                    chatMessageRequest.getReceiveUsername(),
+                    "/queue/messages",
+                    chatMessageRequest
+            );
         }
-    }
-
-    @MessageMapping("/chat.addUser")
-    public void addUser(ChatMessageRequest chatMessageRequest) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatMessageRequest.getChatRoomId())
-                .orElseThrow(() -> new RuntimeException("Chat room not found"));
-
-//        chatRoom.addUser(chatMessageRequest.getSenderUsername());
-//        chatRoomRepository.save(chatRoom);
-        chatMessageRepository.save(ChatMessageMapper.toEntity(chatMessageRequest));
-
-        if (WebSocketEventListener.isUserConnected(chatMessageRequest.getReceiveUsername())) {
-            messagingTemplate.convertAndSendToUser(chatMessageRequest.getReceiveUsername(), "/queue/messages", chatMessageRequest);
-        } else {
-            chatMessageRequest.setDelivered(false);
-            chatMessageRepository.save(ChatMessageMapper.toEntity(chatMessageRequest));
-        }
+        return chatMessageRequest;
     }
 }
